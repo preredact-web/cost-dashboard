@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181a22;
+    --surface-2: #1e2130;
+    --border: #2a2d3a;
+    --text: #e4e4e7;
+    --text-muted: #8b8d9a;
+    --accent: #60a5fa;
+    --green: #4ade80;
+    --red: #f87171;
+    --amber: #fbbf24;
+    --essentials: #3b82f6;
+    --non-essential: #a78bfa;
+    --usage: #f59e0b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  .container { max-width: 960px; margin: 0 auto; }
+
+  /* ── Cash on Hand Banner ── */
+  .cash-banner {
+    background: linear-gradient(135deg, #1a2a1a 0%, #1a2820 100%);
+    border: 1px solid #2d4a2d;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cash-banner .label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6ee7b7;
+    font-weight: 600;
+  }
+
+  .cash-banner .amount {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--green);
+  }
+
+  .cash-banner .updated {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+
+  /* ── Runway Banner ── */
+  .runway-banner {
+    background: linear-gradient(135deg, #2a1a1a 0%, #281a1a 100%);
+    border: 1px solid #4a2d2d;
+    border-radius: 12px;
+    padding: 1.25rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .runway-stat {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  .runway-stat .stat-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  .runway-stat .stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .runway-stat .stat-value.negative { color: var(--red); }
+  .runway-stat .stat-value.warning { color: var(--amber); }
+  .runway-stat .stat-value.positive { color: var(--green); }
+
+  .runway-stat .stat-sub {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+  }
+
+  /* ── Section Headers ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .section-header:first-of-type { margin-top: 0; }
+
+  .section-header h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .section-header .line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-header .total {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--red);
+    font-weight: 600;
+  }
+
+  .section-header .total.revenue { color: var(--green); }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  thead th {
+    background: var(--surface-2);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+
+  thead th:nth-child(2),
+  thead th:nth-child(3),
+  thead th:nth-child(4),
+  thead th:nth-child(5) {
+    text-align: right;
+  }
+
+  tbody td {
+    padding: 0.65rem 1rem;
+    font-size: 0.88rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+  td.cost, td.revenue-val {
+    font-family: 'JetBrains Mono', monospace;
+    text-align: right;
+    font-weight: 500;
+    font-size: 0.85rem;
+  }
+
+  td.date {
+    text-align: right;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+  }
+
+  td.date .ongoing-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    padding: 0.12rem 0.4rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: rgba(245,158,11,0.12);
+    color: var(--usage);
+    border: 1px solid rgba(245,158,11,0.25);
+  }
+
+  /* Category rows */
+  tr.category-row td {
+    background: var(--surface-2);
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 0.5rem 1rem;
+  }
+
+  tr.category-row.essentials td { color: var(--essentials); }
+  tr.category-row.non-essentials td { color: var(--non-essential); }
+  tr.category-row.usage td { color: var(--usage); }
+
+  /* Subtotal row */
+  tr.subtotal td {
+    background: var(--surface-2);
+    font-weight: 700;
+    border-top: 2px solid var(--border);
+    padding: 0.75rem 1rem;
+  }
+
+  tr.subtotal td.cost { color: var(--red); font-size: 0.95rem; }
+
+  /* Net position row */
+  tr.net-row td {
+    background: #1a1a24;
+    font-weight: 700;
+    padding: 0.85rem 1rem;
+    font-size: 0.92rem;
+  }
+
+  tr.net-row td.cost { font-size: 1rem; }
+
+  /* Dropping badge */
+  .badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+
+  .badge.dropping {
+    background: rgba(251,191,36,0.15);
+    color: var(--amber);
+    border: 1px solid rgba(251,191,36,0.3);
+  }
+
+  /* Revenue table */
+  .scenario-header { text-align: right !important; white-space: nowrap; }
+  td.green { color: var(--green); }
+
+  /* Footer */
+  .footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+  }
+
+  /* Editable hint */
+  [contenteditable]:hover {
+    outline: 1px dashed rgba(96,165,250,0.4);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  [contenteditable]:focus {
+    outline: 1px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+    background: rgba(96,165,250,0.05);
+  }
+
+  .edit-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    opacity: 0.5;
+    text-align: right;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Next payment timeline */
+  .next-payment-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .next-payment-bar .np-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .np-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .np-item .np-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--amber);
+    font-weight: 600;
+  }
+
+  .np-item .np-amount {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--red);
+    font-weight: 500;
+  }
+
+  .np-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ════════ CASH ON HAND ════════ -->
+  <div class="cash-banner">
+    <div>
+      <div class="label">Cash on Hand</div>
+      <div class="updated">Updated March 29, 2026</div>
+    </div>
+    <div class="amount" id="cashOnHand" contenteditable="true">$1,300.00</div>
+  </div>
+
+  <!-- ════════ RUNWAY / FUNDING SUMMARY ════════ -->
+  <div class="runway-banner" id="runwayBanner">
+    <div class="runway-stat">
+      <div class="stat-label">April Projected Costs</div>
+      <div class="stat-value negative" id="runwayBurn">$4,225.24</div>
+      <div class="stat-sub">March costs paid in full</div>
+    </div>
+    <div class="runway-stat">
+      <div class="stat-label">Funding Gap for April</div>
+      <div class="stat-value negative" id="runwayShortfall">-$2,925.24</div>
+      <div class="stat-sub">Cash on hand minus April costs</div>
+    </div>
+    <div class="runway-stat">
+      <div class="stat-label">Need to Raise by Apr 8</div>
+      <div class="stat-value warning" id="runwayNeeded">$2,925.24</div>
+      <div class="stat-sub" id="runwayNextDate">First April payment due</div>
+    </div>
+    <div class="runway-stat">
+      <div class="stat-label">Next Payment Due</div>
+      <div class="stat-value warning" id="nextPaymentAmount">$200.00</div>
+      <div class="stat-sub" id="nextPaymentDetail">Apr 8 &mdash; ChatGPT Pro (OpenClaw)</div>
+    </div>
+  </div>
+
+  <!-- ════════ AI SPENDING ════════ -->
+  <div class="section-header">
+    <h2>AI Spending &mdash; April 2026 (Projected)</h2>
+    <div class="line"></div>
+    <div class="total" id="totalCost">$4,225.24</div>
+  </div>
+
+  <div class="edit-hint">Click any value to edit</div>
+
+  <table id="costTable">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th>Cost</th>
+        <th>Next Payment</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Essentials -->
+      <tr class="category-row essentials"><td colspan="3">Essentials</td></tr>
+      <tr data-date="2026-04-26"><td>Claude Max (&times;3)</td><td class="cost" contenteditable="true">$600.00</td><td class="date">Apr 26, 2026</td></tr>
+      <tr data-date="2026-04-15"><td>Firecrawl</td><td class="cost" contenteditable="true">$100.00</td><td class="date">Apr 15, 2026</td></tr>
+      <tr data-date="2026-04-14"><td>Whisper Flow</td><td class="cost" contenteditable="true">$90.00</td><td class="date">Apr 14, 2026</td></tr>
+      <tr data-date="2026-04-21"><td>Browser</td><td class="cost" contenteditable="true">$75.00</td><td class="date">Apr 21, 2026</td></tr>
+
+      <!-- Non-Essentials Fixed -->
+      <tr class="category-row non-essentials"><td colspan="3">Non-Essentials &mdash; Fixed</td></tr>
+      <tr data-date="2026-04-08"><td>ChatGPT Pro (&times;1) &mdash; OpenClaw</td><td class="cost" contenteditable="true">$200.00</td><td class="date">Apr 8, 2026</td></tr>
+      <tr data-date="2026-04-17"><td>ChatGPT Pro (&times;1) &mdash; Firehorse</td><td class="cost" contenteditable="true">$200.00</td><td class="date">Apr 17, 2026</td></tr>
+      <tr data-date="2026-04-24"><td>Mini Max <span class="badge dropping">Dropping</span></td><td class="cost" contenteditable="true">$200.00</td><td class="date">Apr 24, 2026</td></tr>
+      <tr data-date="2026-04-30"><td>Zep Cloud <span class="badge dropping">Dropping</span></td><td class="cost" contenteditable="true">$130.00</td><td class="date"><span class="ongoing-badge">Monthly</span></td></tr>
+      <tr data-date="2026-04-30"><td>Eleven Labs <span class="badge dropping">Dropping</span></td><td class="cost" contenteditable="true">$99.00</td><td class="date"><span class="ongoing-badge">Monthly</span></td></tr>
+      <tr data-date="2026-04-21"><td>Supabase</td><td class="cost" contenteditable="true">$75.00</td><td class="date">Apr 21, 2026</td></tr>
+      <tr data-date="2026-04-27"><td>Hume AI</td><td class="cost" contenteditable="true">$75.00</td><td class="date">Apr 27, 2026</td></tr>
+      <tr data-date="2026-04-26"><td>Twilit</td><td class="cost" contenteditable="true">$50.00</td><td class="date">Apr 26, 2026</td></tr>
+      <tr data-date="2026-04-24"><td>Manus</td><td class="cost" contenteditable="true">$45.00</td><td class="date">Apr 24, 2026</td></tr>
+      <tr data-date="2026-04-28"><td>Gemini</td><td class="cost" contenteditable="true">$40.00</td><td class="date">Apr 28, 2026</td></tr>
+
+      <!-- Usage-Based -->
+      <tr class="category-row usage"><td colspan="3">Non-Essentials &mdash; Usage-Based</td></tr>
+      <tr data-date="2026-04-30"><td>OpenClaw (per-use)</td><td class="cost" contenteditable="true">$1,167.38</td><td class="date"><span class="ongoing-badge">Usage</span></td></tr>
+      <tr data-date="2026-04-30"><td>Extra usage (API tokens)</td><td class="cost" contenteditable="true">$578.86</td><td class="date"><span class="ongoing-badge">Usage</span></td></tr>
+      <tr data-date="2026-04-30"><td>Vast AI (GPU)</td><td class="cost" contenteditable="true">$500.00</td><td class="date"><span class="ongoing-badge">Usage</span></td></tr>
+
+      <!-- Total -->
+      <tr class="subtotal">
+        <td>Total Monthly Spend</td>
+        <td class="cost" id="totalRow">$4,225.24</td>
+        <td></td>
+      </tr>
+      <tr class="net-row">
+        <td>April Funding Gap (Cash &minus; Costs)</td>
+        <td class="cost" id="netPosition" style="color: var(--red);">-$2,925.24</td>
+        <td class="date" id="netLabel">Need to raise</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Upcoming payment timeline -->
+  <div class="next-payment-bar">
+    <div class="np-label">Upcoming Payments</div>
+    <div class="np-item"><span>ChatGPT (OC)</span><span class="np-date">Apr 8</span><span class="np-amount">$200</span></div>
+    <div class="np-divider"></div>
+    <div class="np-item"><span>Whisper Flow</span><span class="np-date">Apr 14</span><span class="np-amount">$90</span></div>
+    <div class="np-divider"></div>
+    <div class="np-item"><span>Firecrawl</span><span class="np-date">Apr 15</span><span class="np-amount">$100</span></div>
+    <div class="np-divider"></div>
+    <div class="np-item"><span>ChatGPT (FH)</span><span class="np-date">Apr 17</span><span class="np-amount">$200</span></div>
+    <div class="np-divider"></div>
+    <div class="np-item"><span>Browser + Supa</span><span class="np-date">Apr 21</span><span class="np-amount">$150</span></div>
+    <div class="np-divider"></div>
+    <div class="np-item"><span>MiniMax + Manus</span><span class="np-date">Apr 24</span><span class="np-amount">$245</span></div>
+  </div>
+
+  <!-- ════════ PROJECTED REVENUE ════════ -->
+  <div class="section-header">
+    <h2>Projected Revenue &mdash; Aircraft Financing</h2>
+    <div class="line"></div>
+    <div class="total revenue">1.5% Acquisition Fee &middot; 50% Share</div>
+  </div>
+
+  <table id="revenueTable">
+    <thead>
+      <tr>
+        <th>Deal Scenario</th>
+        <th class="scenario-header">Loan Amount</th>
+        <th class="scenario-header">Gross Fee (1.5%)</th>
+        <th class="scenario-header">Your Share (50%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Conservative</td>
+        <td class="cost" contenteditable="true">$4,500,000</td>
+        <td class="cost green" data-calc="fee">$67,500.00</td>
+        <td class="cost green" style="font-weight:700;" data-calc="share">$33,750.00</td>
+      </tr>
+      <tr>
+        <td>Base Case</td>
+        <td class="cost" contenteditable="true">$5,000,000</td>
+        <td class="cost green" data-calc="fee">$75,000.00</td>
+        <td class="cost green" style="font-weight:700;" data-calc="share">$37,500.00</td>
+      </tr>
+      <tr>
+        <td>Target</td>
+        <td class="cost" contenteditable="true">$17,000,000</td>
+        <td class="cost green" data-calc="fee">$255,000.00</td>
+        <td class="cost green" style="font-weight:700;" data-calc="share">$127,500.00</td>
+      </tr>
+      <tr>
+        <td>Upside</td>
+        <td class="cost" contenteditable="true">$100,000,000</td>
+        <td class="cost green" data-calc="fee">$1,500,000.00</td>
+        <td class="cost green" style="font-weight:700;" data-calc="share">$750,000.00</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">Click any dollar value to edit &middot; Totals auto-recalculate &middot; Revenue = 1.5% fee &times; 50% share</div>
+
+</div>
+
+<script>
+  function parseCurrency(str) {
+    return parseFloat(str.replace(/[^0-9.\-]/g, '')) || 0;
+  }
+
+  function formatCurrency(n) {
+    const neg = n < 0;
+    const abs = Math.abs(n);
+    const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return (neg ? '-$' : '$') + formatted;
+  }
+
+  function recalcAll() {
+    // Cost totals
+    const rows = document.querySelectorAll('#costTable tbody tr:not(.category-row):not(.subtotal):not(.net-row)');
+    let totalCost = 0;
+    rows.forEach(row => {
+      const cell = row.querySelector('.cost');
+      if (cell) totalCost += parseCurrency(cell.textContent);
+    });
+    document.getElementById('totalRow').textContent = formatCurrency(totalCost);
+    document.getElementById('totalCost').textContent = formatCurrency(totalCost);
+
+    // Cash on hand
+    const cash = parseCurrency(document.getElementById('cashOnHand').textContent);
+
+    // Net position
+    const net = cash - totalCost;
+    const netEl = document.getElementById('netPosition');
+    const netLabel = document.getElementById('netLabel');
+    netEl.textContent = formatCurrency(net);
+    netEl.style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
+    netLabel.textContent = net >= 0 ? 'Covered' : 'Need to raise';
+
+    // Runway banner
+    document.getElementById('runwayBurn').textContent = formatCurrency(totalCost);
+    document.getElementById('runwayShortfall').textContent = formatCurrency(net);
+    const shortfallEl = document.getElementById('runwayShortfall');
+    shortfallEl.className = 'stat-value ' + (net >= 0 ? 'positive' : 'negative');
+
+    const needed = Math.max(0, totalCost - cash);
+    document.getElementById('runwayNeeded').textContent = formatCurrency(needed);
+
+    // Revenue calc (50% of 1.5%)
+    const revRows = document.querySelectorAll('#revenueTable tbody tr');
+    revRows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if (cells.length >= 4) {
+        const loan = parseCurrency(cells[1].textContent);
+        const fee = loan * 0.015;
+        const share = fee * 0.5;
+        cells[2].textContent = formatCurrency(fee);
+        cells[3].textContent = formatCurrency(share);
+      }
+    });
+  }
+
+  document.addEventListener('input', recalcAll);
+
+  document.addEventListener('focusout', (e) => {
+    if (e.target.contentEditable === 'true') {
+      if (e.target.classList.contains('cost') || e.target.id === 'cashOnHand') {
+        const val = parseCurrency(e.target.textContent);
+        e.target.textContent = formatCurrency(val);
+        recalcAll();
+      }
+    }
+  });
+</script>
+</body>
+</html>
