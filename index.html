@@ -212,12 +212,13 @@ function getCurrentMessages() {
   return conversations[currentConvId].messages || [];
 }
 
-function addMessage(role, content) {
+function addMessage(role, content, displayText) {
   if (!currentConvId) {
     currentConvId = generateConvId();
     conversations[currentConvId] = { name: content.slice(0, 40), created: Date.now(), messages: [] };
   }
-  conversations[currentConvId].messages.push({ role: role, content: content });
+  // Store display text separately for assistant messages so we send clean text to API
+  conversations[currentConvId].messages.push({ role: role, content: content, display: displayText || content });
   saveConversations();
 }
 
@@ -250,15 +251,10 @@ function renderChatMessages() {
   recent.forEach(function(m) {
     var div = document.createElement('div');
     div.className = 'chat-msg ' + m.role;
-    if (m.role === 'assistant' && m.content.indexOf('"action":"update"') !== -1) div.classList.add('change');
-    // For assistant, show just the message part
+    // For assistant, show the clean display text
     if (m.role === 'assistant') {
-      try {
-        var parsed = JSON.parse(m.content);
-        div.textContent = parsed.message || m.content;
-      } catch(e) {
-        div.textContent = m.content;
-      }
+      div.textContent = m.display || m.content;
+      if (m.wasUpdate) div.classList.add('change');
     } else {
       div.textContent = m.content;
     }
@@ -536,11 +532,11 @@ async function sendPrompt() {
   input.value = '';
   btn.disabled = true;
 
-  // Build messages for Anthropic (full conversation history)
+  // Build messages for Anthropic — send CLEAN TEXT for assistant messages, not raw JSON
   var apiMessages = getCurrentMessages().map(function(m) {
     if (m.role === 'user') return { role: 'user', content: m.content };
-    // For assistant messages, send the raw text Claude returned
-    return { role: 'assistant', content: m.content };
+    // Send the display text (human-readable summary), NOT the raw JSON
+    return { role: 'assistant', content: m.display || m.content };
   });
 
   try {
@@ -557,22 +553,28 @@ async function sendPrompt() {
     var data = await res.json();
 
     if (data.error) {
-      addMessage('assistant', JSON.stringify({ action: 'chat', message: 'Error: ' + data.error }));
+      addMessage('assistant', 'Error: ' + data.error);
       renderChatMessages();
       btn.disabled = false;
       return;
     }
 
-    // Save the raw response as the assistant message
-    var rawText = data._rawAssistant || JSON.stringify(data);
-    addMessage('assistant', rawText);
+    // Save CLEAN display text as the assistant message — never raw JSON
+    var displayMsg = data.message || 'Done.';
+    var wasUpdate = data.action === 'update';
+    if (!currentConvId) {
+      currentConvId = generateConvId();
+      conversations[currentConvId] = { name: prompt.slice(0, 40), created: Date.now(), messages: [] };
+    }
+    conversations[currentConvId].messages.push({ role: 'assistant', content: displayMsg, display: displayMsg, wasUpdate: wasUpdate });
+    saveConversations();
     renderChatMessages();
 
-    // Apply any updates
+    // Apply any updates to the dashboard
     applyUpdates(data);
 
   } catch (e) {
-    addMessage('assistant', JSON.stringify({ action: 'chat', message: 'Network error: ' + e.message }));
+    addMessage('assistant', 'Network error: ' + e.message);
     renderChatMessages();
   }
   btn.disabled = false;
