@@ -361,7 +361,7 @@ function renderDashboard() {
       });
 
       costBody.appendChild(tr);
-      total += c.cost;
+      total += Number(c.cost) || 0;
     });
   });
 
@@ -376,6 +376,7 @@ function renderDashboard() {
   var netTr = document.createElement('tr');
   netTr.className = 'net-row';
   netTr.innerHTML = '<td>April Funding Gap (Cash \u2212 Costs)</td><td class="cost" id="netPosition" style="color:' + (net >= 0 ? 'var(--green)' : 'var(--red)') + '">' + f(net) + '</td><td class="date" id="netLabel">' + (net >= 0 ? 'Covered' : 'Need to raise') + '</td>' + cc.map(function() { return '<td></td>'; }).join('');
+  costBody.appendChild(netTr);
 
   // Header totals
   document.getElementById('totalCost').textContent = f(total);
@@ -543,13 +544,13 @@ function applyUpdates(data) {
   if (data.action === 'chat') return; // Just a conversation, no changes
 
   if (data.cashOnHand !== null && data.cashOnHand !== undefined) {
-    state.cashOnHand = data.cashOnHand;
+    state.cashOnHand = Number(data.cashOnHand) || 0;
   }
 
   if (data.costUpdates && data.costUpdates.length) {
     data.costUpdates.forEach(function(u) {
       var found = state.costs.find(function(c) { return c.id === u.id; });
-      if (found) found.cost = u.newCost;
+      if (found) found.cost = Number(u.newCost) || 0;
     });
   }
 
@@ -564,7 +565,7 @@ function applyUpdates(data) {
       state.costs.push({
         id: c.id || makeId(c.name),
         name: c.name,
-        cost: c.cost,
+        cost: Number(c.cost) || 0,
         category: c.category || 'non-essential-fixed',
         nextPayment: c.nextPayment || 'Monthly',
         dropping: false,
@@ -575,7 +576,7 @@ function applyUpdates(data) {
   if (data.revenueUpdates && data.revenueUpdates.length) {
     data.revenueUpdates.forEach(function(u) {
       var found = state.revenue.find(function(r) { return r.id === u.id; });
-      if (found) found.loanAmount = u.loanAmount;
+      if (found) found.loanAmount = Number(u.loanAmount) || 0;
     });
   }
 
@@ -584,7 +585,7 @@ function applyUpdates(data) {
       state.revenue.push({
         id: r.id || makeId(r.scenario),
         scenario: r.scenario,
-        loanAmount: r.loanAmount,
+        loanAmount: Number(r.loanAmount) || 0,
       });
     });
   }
