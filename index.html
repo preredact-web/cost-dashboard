@@ -12,7 +12,7 @@
     --red: #f87171; --amber: #fbbf24; --essentials: #3b82f6; --non-essential: #a78bfa; --usage: #f59e0b;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem; padding-bottom: 8rem; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem; padding-bottom: 11rem; }
   .container { max-width: 960px; margin: 0 auto; }
   .cash-banner { background: linear-gradient(135deg, #1a2a1a, #1a2820); border: 1px solid #2d4a2d; border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: .75rem; display: flex; align-items: center; justify-content: space-between; }
   .cash-banner .label { font-size: .85rem; text-transform: uppercase; letter-spacing: .1em; color: #6ee7b7; font-weight: 600; }
@@ -63,23 +63,28 @@
   .npv { width: 1px; height: 20px; background: var(--border); }
 
   /* Chat bar */
-  .chat-container { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 1rem 2rem; z-index: 100; }
-  .chat-inner { max-width: 960px; margin: 0 auto; display: flex; gap: .75rem; align-items: center; }
-  .chat-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .9rem; padding: .85rem 1.2rem; outline: none; }
+  .chat-container { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: .75rem 2rem 1rem; z-index: 100; }
+  .chat-messages { max-width: 960px; margin: 0 auto .6rem; max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: .4rem; }
+  .chat-msg { font-size: .8rem; padding: .45rem .75rem; border-radius: 8px; max-width: 85%; word-wrap: break-word; line-height: 1.4; }
+  .chat-msg.user { background: rgba(96,165,250,.15); color: var(--accent); align-self: flex-end; border: 1px solid rgba(96,165,250,.2); }
+  .chat-msg.assistant { background: var(--surface-2); color: var(--text); align-self: flex-start; border: 1px solid var(--border); }
+  .chat-msg.assistant.change { border-left: 3px solid var(--green); }
+  .chat-inner { max-width: 960px; margin: 0 auto; display: flex; gap: .6rem; align-items: center; }
+  .chat-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .9rem; padding: .75rem 1rem; outline: none; }
   .chat-input:focus { border-color: var(--accent); }
   .chat-input::placeholder { color: var(--text-muted); opacity: .6; }
-  .chat-send { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: .85rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .chat-send { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: .75rem 1.3rem; font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
   .chat-send:hover { opacity: .85; }
   .chat-send:disabled { opacity: .4; cursor: not-allowed; }
-  .gear-btn { background: none; border: 1px solid var(--border); border-radius: 10px; padding: .7rem .85rem; cursor: pointer; font-size: 1.1rem; line-height: 1; color: var(--text-muted); }
+  .gear-btn { background: none; border: 1px solid var(--border); border-radius: 10px; padding: .6rem .75rem; cursor: pointer; font-size: 1rem; line-height: 1; color: var(--text-muted); }
   .gear-btn:hover { border-color: var(--accent); color: var(--accent); }
   .gear-btn.has-key { border-color: var(--green); color: var(--green); }
-  .chat-status { font-size: .72rem; color: var(--text-muted); text-align: center; margin-top: .5rem; max-width: 960px; margin-left: auto; margin-right: auto; }
-  .chat-status.success { color: var(--green); }
-  .chat-status.error { color: var(--red); }
-  .chat-status.loading { color: var(--amber); }
+  .new-chat-btn { background: none; border: 1px solid var(--border); border-radius: 10px; padding: .6rem .75rem; cursor: pointer; font-size: .75rem; line-height: 1; color: var(--text-muted); font-family: 'DM Sans', sans-serif; }
+  .new-chat-btn:hover { border-color: var(--amber); color: var(--amber); }
+  .conv-select { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: .72rem; padding: .4rem .5rem; outline: none; max-width: 140px; cursor: pointer; }
+  .conv-select:focus { border-color: var(--accent); }
 
-  /* API Key Modal */
+  /* Modal */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; }
   .modal-overlay.show { display: flex; }
   .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 2rem; width: 90%; max-width: 480px; }
@@ -102,8 +107,8 @@
 <!-- API Key Modal -->
 <div class="modal-overlay" id="keyModal">
   <div class="modal">
-    <h3>&#x1f511; API Key</h3>
-    <p>Paste your Anthropic API key below. It's saved in your browser only &mdash; never sent anywhere except Anthropic's API.<br><br>Get one at <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent)">console.anthropic.com/settings/keys</a></p>
+    <h3>API Key</h3>
+    <p>Paste your Anthropic API key below. It stays in your browser only.<br><br>Get one at <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent)">console.anthropic.com/settings/keys</a></p>
     <div class="key-status none" id="keyStatus">No API key saved</div>
     <input type="password" id="keyInput" placeholder="sk-ant-api03-..." />
     <div class="modal-btns">
@@ -115,7 +120,7 @@
 </div>
 
 <div class="container">
-  <div class="cash-banner"><div><div class="label">Cash on Hand</div><div class="updated" id="updatedDate">Updated March 29, 2026</div></div><div class="amount" id="cashOnHand" contenteditable="true">$1,300.00</div></div>
+  <div class="cash-banner"><div><div class="label">Cash on Hand</div><div class="updated" id="updatedDate">Updated March 30, 2026</div></div><div class="amount" id="cashOnHand" contenteditable="true">$1,300.00</div></div>
   <div class="runway-banner">
     <div class="runway-stat"><div class="stat-label">April Projected Costs</div><div class="stat-value negative" id="runwayBurn">$4,225.24</div><div class="stat-sub">March costs paid in full</div></div>
     <div class="runway-stat"><div class="stat-label">Funding Gap for April</div><div class="stat-value negative" id="runwayShortfall">-$2,925.24</div><div class="stat-sub">Cash on hand minus April costs</div></div>
@@ -126,30 +131,7 @@
   <div class="section-header"><h2>AI Spending &mdash; April 2026 (Projected)</h2><div class="line"></div><div class="total" id="totalCost">$4,225.24</div></div>
   <div class="edit-hint">Click any value to edit &middot; Or use the prompt bar below</div>
 
-  <table id="costTable"><thead><tr><th>Service</th><th>Cost</th><th>Next Payment</th></tr></thead><tbody>
-    <tr class="cat ess"><td colspan="3">Essentials</td></tr>
-    <tr><td>Claude Max (x3)</td><td class="cost" contenteditable="true">$600.00</td><td class="date">Apr 26, 2026</td></tr>
-    <tr><td>Firecrawl</td><td class="cost" contenteditable="true">$100.00</td><td class="date">Apr 15, 2026</td></tr>
-    <tr><td>Whisper Flow</td><td class="cost" contenteditable="true">$90.00</td><td class="date">Apr 14, 2026</td></tr>
-    <tr><td>Browser</td><td class="cost" contenteditable="true">$75.00</td><td class="date">Apr 21, 2026</td></tr>
-    <tr class="cat ne"><td colspan="3">Non-Essentials &mdash; Fixed</td></tr>
-    <tr><td>ChatGPT Pro (x1) &ndash; OpenClaw</td><td class="cost" contenteditable="true">$200.00</td><td class="date">Apr 8, 2026</td></tr>
-    <tr><td>ChatGPT Pro (x1) &ndash; Firehorse</td><td class="cost" contenteditable="true">$200.00</td><td class="date">Apr 17, 2026</td></tr>
-    <tr><td>Mini Max <span class="badge dropping">Dropping</span></td><td class="cost" contenteditable="true">$200.00</td><td class="date">Apr 24, 2026</td></tr>
-    <tr><td>Zep Cloud <span class="badge dropping">Dropping</span></td><td class="cost" contenteditable="true">$130.00</td><td class="date"><span class="ongoing-badge">Monthly</span></td></tr>
-    <tr><td>Eleven Labs <span class="badge dropping">Dropping</span></td><td class="cost" contenteditable="true">$99.00</td><td class="date"><span class="ongoing-badge">Monthly</span></td></tr>
-    <tr><td>Supabase</td><td class="cost" contenteditable="true">$75.00</td><td class="date">Apr 21, 2026</td></tr>
-    <tr><td>Hume AI</td><td class="cost" contenteditable="true">$75.00</td><td class="date">Apr 27, 2026</td></tr>
-    <tr><td>Twilit</td><td class="cost" contenteditable="true">$50.00</td><td class="date">Apr 26, 2026</td></tr>
-    <tr><td>Manus</td><td class="cost" contenteditable="true">$45.00</td><td class="date">Apr 24, 2026</td></tr>
-    <tr><td>Gemini</td><td class="cost" contenteditable="true">$40.00</td><td class="date">Apr 28, 2026</td></tr>
-    <tr class="cat ub"><td colspan="3">Non-Essentials &mdash; Usage-Based</td></tr>
-    <tr><td>OpenClaw (per-use)</td><td class="cost" contenteditable="true">$1,167.38</td><td class="date"><span class="ongoing-badge">Usage</span></td></tr>
-    <tr><td>Extra usage (API tokens)</td><td class="cost" contenteditable="true">$578.86</td><td class="date"><span class="ongoing-badge">Usage</span></td></tr>
-    <tr><td>Vast AI (GPU)</td><td class="cost" contenteditable="true">$500.00</td><td class="date"><span class="ongoing-badge">Usage</span></td></tr>
-    <tr class="subtotal"><td>Total Monthly Spend</td><td class="cost" id="totalRow">$4,225.24</td><td></td></tr>
-    <tr class="net-row"><td>April Funding Gap (Cash &minus; Costs)</td><td class="cost" id="netPosition" style="color:var(--red)">-$2,925.24</td><td class="date" id="netLabel">Need to raise</td></tr>
-  </tbody></table>
+  <table id="costTable"><thead><tr><th>Service</th><th>Cost</th><th>Next Payment</th></tr></thead><tbody id="costBody"></tbody></table>
 
   <div class="npb"><div class="npl">Upcoming Payments</div>
     <div class="npi"><span>ChatGPT (OC)</span><span class="npd">Apr 8</span><span class="npa">$200</span></div><div class="npv"></div>
@@ -161,47 +143,275 @@
   </div>
 
   <div class="section-header"><h2>Projected Revenue &mdash; Aircraft Financing</h2><div class="line"></div><div class="total revenue">1.5% Fee / 50% Share</div></div>
-  <table id="revenueTable"><thead><tr><th>Deal Scenario</th><th style="text-align:right">Loan Amount</th><th style="text-align:right">Gross Fee (1.5%)</th><th style="text-align:right">Your Share (50%)</th></tr></thead><tbody>
-    <tr><td>Conservative</td><td class="cost" contenteditable="true">$4,500,000</td><td class="cost green">$67,500.00</td><td class="cost green" style="font-weight:700">$33,750.00</td></tr>
-    <tr><td>Base Case</td><td class="cost" contenteditable="true">$5,000,000</td><td class="cost green">$75,000.00</td><td class="cost green" style="font-weight:700">$37,500.00</td></tr>
-    <tr><td>Target</td><td class="cost" contenteditable="true">$17,000,000</td><td class="cost green">$255,000.00</td><td class="cost green" style="font-weight:700">$127,500.00</td></tr>
-    <tr><td>Upside</td><td class="cost" contenteditable="true">$100,000,000</td><td class="cost green">$1,500,000.00</td><td class="cost green" style="font-weight:700">$750,000.00</td></tr>
-  </tbody></table>
+  <table id="revenueTable"><thead><tr><th>Deal Scenario</th><th style="text-align:right">Loan Amount</th><th style="text-align:right">Gross Fee (1.5%)</th><th style="text-align:right">Your Share (50%)</th></tr></thead><tbody id="revBody"></tbody></table>
 
   <div class="footer">Click any dollar value to edit &middot; Totals auto-recalculate &middot; Use the prompt bar to make changes with natural language</div>
 </div>
 
 <!-- Fixed chat bar -->
 <div class="chat-container">
+  <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-inner">
     <button class="gear-btn" id="gearBtn" title="Set API Key">&#x2699;</button>
-    <input class="chat-input" id="chatInput" type="text" placeholder='e.g. "Update cash to $3,000" or "Drop Mini Max" or "We closed the $5M deal"' />
-    <button class="chat-send" id="chatSend">Update</button>
+    <select class="conv-select" id="convSelect" title="Conversations"></select>
+    <button class="new-chat-btn" id="newChatBtn" title="New conversation">+ New</button>
+    <input class="chat-input" id="chatInput" type="text" placeholder='e.g. "Update cash to $3,000" or "Drop Mini Max"' />
+    <button class="chat-send" id="chatSend">Send</button>
   </div>
-  <div class="chat-status" id="chatStatus"></div>
 </div>
 
 <script>
-// --- Helpers ---
-function p(s) { return parseFloat(String(s).replace(/[^0-9.\-]/g, '')) || 0; }
-function f(n) { var neg = n < 0; var a = Math.abs(n); return (neg ? '-$' : '$') + a.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+// ===== DATA =====
+var DEFAULT_COSTS = [
+  { id: 'claude-max', name: 'Claude Max (x3)', cost: 600, category: 'essentials', nextPayment: 'Apr 26, 2026', dropping: false },
+  { id: 'firecrawl', name: 'Firecrawl', cost: 100, category: 'essentials', nextPayment: 'Apr 15, 2026', dropping: false },
+  { id: 'whisper-flow', name: 'Whisper Flow', cost: 90, category: 'essentials', nextPayment: 'Apr 14, 2026', dropping: false },
+  { id: 'browser', name: 'Browser', cost: 75, category: 'essentials', nextPayment: 'Apr 21, 2026', dropping: false },
+  { id: 'chatgpt-openclaw', name: 'ChatGPT Pro (x1) - OpenClaw', cost: 200, category: 'non-essential-fixed', nextPayment: 'Apr 8, 2026', dropping: false },
+  { id: 'chatgpt-firehorse', name: 'ChatGPT Pro (x1) - Firehorse', cost: 200, category: 'non-essential-fixed', nextPayment: 'Apr 17, 2026', dropping: false },
+  { id: 'mini-max', name: 'Mini Max', cost: 200, category: 'non-essential-fixed', nextPayment: 'Apr 24, 2026', dropping: true },
+  { id: 'zep-cloud', name: 'Zep Cloud', cost: 130, category: 'non-essential-fixed', nextPayment: 'Monthly', dropping: true },
+  { id: 'eleven-labs', name: 'Eleven Labs', cost: 99, category: 'non-essential-fixed', nextPayment: 'Monthly', dropping: true },
+  { id: 'supabase', name: 'Supabase', cost: 75, category: 'non-essential-fixed', nextPayment: 'Apr 21, 2026', dropping: false },
+  { id: 'hume-ai', name: 'Hume AI', cost: 75, category: 'non-essential-fixed', nextPayment: 'Apr 27, 2026', dropping: false },
+  { id: 'twilit', name: 'Twilit', cost: 50, category: 'non-essential-fixed', nextPayment: 'Apr 26, 2026', dropping: false },
+  { id: 'manus', name: 'Manus', cost: 45, category: 'non-essential-fixed', nextPayment: 'Apr 24, 2026', dropping: false },
+  { id: 'gemini', name: 'Gemini', cost: 40, category: 'non-essential-fixed', nextPayment: 'Apr 28, 2026', dropping: false },
+  { id: 'openclaw-usage', name: 'OpenClaw (per-use)', cost: 1167.38, category: 'usage', nextPayment: 'Usage', dropping: false },
+  { id: 'api-tokens', name: 'Extra usage (API tokens)', cost: 578.86, category: 'usage', nextPayment: 'Usage', dropping: false },
+  { id: 'vast-ai', name: 'Vast AI (GPU)', cost: 500, category: 'usage', nextPayment: 'Usage', dropping: false },
+];
 
-// --- API Key Modal ---
+var DEFAULT_REVENUE = [
+  { id: 'conservative', scenario: 'Conservative', loanAmount: 4500000 },
+  { id: 'base-case', scenario: 'Base Case', loanAmount: 5000000 },
+  { id: 'target', scenario: 'Target', loanAmount: 17000000 },
+  { id: 'upside', scenario: 'Upside', loanAmount: 100000000 },
+];
+
+// ===== STATE =====
+var state = {
+  cashOnHand: 1300,
+  costs: JSON.parse(JSON.stringify(DEFAULT_COSTS)),
+  revenue: JSON.parse(JSON.stringify(DEFAULT_REVENUE)),
+};
+
+// ===== CONVERSATIONS =====
+var conversations = JSON.parse(localStorage.getItem('dash_conversations') || '{}');
+var currentConvId = localStorage.getItem('dash_current_conv') || null;
+
+function generateConvId() { return 'conv_' + Date.now(); }
+
+function saveConversations() {
+  localStorage.setItem('dash_conversations', JSON.stringify(conversations));
+  localStorage.setItem('dash_current_conv', currentConvId || '');
+}
+
+function getCurrentMessages() {
+  if (!currentConvId || !conversations[currentConvId]) return [];
+  return conversations[currentConvId].messages || [];
+}
+
+function addMessage(role, content) {
+  if (!currentConvId) {
+    currentConvId = generateConvId();
+    conversations[currentConvId] = { name: content.slice(0, 40), created: Date.now(), messages: [] };
+  }
+  conversations[currentConvId].messages.push({ role: role, content: content });
+  saveConversations();
+}
+
+function renderConvSelect() {
+  var sel = document.getElementById('convSelect');
+  sel.innerHTML = '';
+  var ids = Object.keys(conversations).sort(function(a, b) { return (conversations[b].created || 0) - (conversations[a].created || 0); });
+  if (ids.length === 0) {
+    var opt = document.createElement('option');
+    opt.textContent = 'No conversations';
+    opt.disabled = true;
+    sel.appendChild(opt);
+    return;
+  }
+  ids.forEach(function(id) {
+    var opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = conversations[id].name || 'Untitled';
+    if (id === currentConvId) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function renderChatMessages() {
+  var container = document.getElementById('chatMessages');
+  container.innerHTML = '';
+  var msgs = getCurrentMessages();
+  // Show last 6 messages
+  var recent = msgs.slice(-6);
+  recent.forEach(function(m) {
+    var div = document.createElement('div');
+    div.className = 'chat-msg ' + m.role;
+    if (m.role === 'assistant' && m.content.indexOf('"action":"update"') !== -1) div.classList.add('change');
+    // For assistant, show just the message part
+    if (m.role === 'assistant') {
+      try {
+        var parsed = JSON.parse(m.content);
+        div.textContent = parsed.message || m.content;
+      } catch(e) {
+        div.textContent = m.content;
+      }
+    } else {
+      div.textContent = m.content;
+    }
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+// ===== HELPERS =====
+function p(s) { return parseFloat(String(s).replace(/[^0-9.\-]/g, '')) || 0; }
+function f(n) { var neg = n < 0; var a = Math.abs(n); return (neg ? '-$' : '$') + a.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+function makeId(name) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+// ===== RENDER =====
+function renderDashboard() {
+  document.getElementById('cashOnHand').textContent = f(state.cashOnHand);
+  var now = new Date();
+  document.getElementById('updatedDate').textContent = 'Updated ' + now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+  var costBody = document.getElementById('costBody');
+  costBody.innerHTML = '';
+
+  var categories = [
+    { key: 'essentials', label: 'Essentials', cls: 'ess' },
+    { key: 'non-essential-fixed', label: 'Non-Essentials \u2014 Fixed', cls: 'ne' },
+    { key: 'usage', label: 'Non-Essentials \u2014 Usage-Based', cls: 'ub' },
+  ];
+
+  var total = 0;
+
+  categories.forEach(function(cat) {
+    // Category header
+    var catTr = document.createElement('tr');
+    catTr.className = 'cat ' + cat.cls;
+    var catTd = document.createElement('td');
+    catTd.colSpan = 3;
+    catTd.textContent = cat.label;
+    catTr.appendChild(catTd);
+    costBody.appendChild(catTr);
+
+    state.costs.filter(function(c) { return c.category === cat.key; }).forEach(function(c) {
+      var tr = document.createElement('tr');
+      tr.setAttribute('data-id', c.id);
+
+      var td1 = document.createElement('td');
+      td1.textContent = c.name;
+      if (c.dropping) {
+        var badge = document.createElement('span');
+        badge.className = 'badge dropping';
+        badge.textContent = 'Dropping';
+        td1.appendChild(document.createTextNode(' '));
+        td1.appendChild(badge);
+      }
+
+      var td2 = document.createElement('td');
+      td2.className = 'cost';
+      td2.contentEditable = 'true';
+      td2.textContent = f(c.cost);
+
+      var td3 = document.createElement('td');
+      td3.className = 'date';
+      if (c.nextPayment && c.nextPayment.match(/^(Usage|Monthly)$/i)) {
+        var badge2 = document.createElement('span');
+        badge2.className = 'ongoing-badge';
+        badge2.textContent = c.nextPayment;
+        td3.appendChild(badge2);
+      } else {
+        td3.textContent = c.nextPayment || '';
+      }
+
+      tr.appendChild(td1);
+      tr.appendChild(td2);
+      tr.appendChild(td3);
+      costBody.appendChild(tr);
+      total += c.cost;
+    });
+  });
+
+  // Subtotal
+  var subTr = document.createElement('tr');
+  subTr.className = 'subtotal';
+  subTr.innerHTML = '<td>Total Monthly Spend</td><td class="cost" id="totalRow">' + f(total) + '</td><td></td>';
+  costBody.appendChild(subTr);
+
+  // Net row
+  var net = state.cashOnHand - total;
+  var netTr = document.createElement('tr');
+  netTr.className = 'net-row';
+  netTr.innerHTML = '<td>April Funding Gap (Cash \u2212 Costs)</td><td class="cost" id="netPosition" style="color:' + (net >= 0 ? 'var(--green)' : 'var(--red)') + '">' + f(net) + '</td><td class="date" id="netLabel">' + (net >= 0 ? 'Covered' : 'Need to raise') + '</td>';
+  costBody.appendChild(netTr);
+
+  // Header totals
+  document.getElementById('totalCost').textContent = f(total);
+  document.getElementById('runwayBurn').textContent = f(total);
+  document.getElementById('runwayShortfall').textContent = f(net);
+  document.getElementById('runwayShortfall').className = 'stat-value ' + (net >= 0 ? 'positive' : 'negative');
+  document.getElementById('runwayNeeded').textContent = f(Math.max(0, total - state.cashOnHand));
+
+  // Revenue
+  var revBody = document.getElementById('revBody');
+  revBody.innerHTML = '';
+  state.revenue.forEach(function(r) {
+    var fee = r.loanAmount * 0.015;
+    var share = fee * 0.5;
+    var tr = document.createElement('tr');
+    tr.setAttribute('data-id', r.id);
+    tr.innerHTML = '<td>' + r.scenario + '</td><td class="cost" contenteditable="true">' + f(r.loanAmount) + '</td><td class="cost green">' + f(fee) + '</td><td class="cost green" style="font-weight:700">' + f(share) + '</td>';
+    revBody.appendChild(tr);
+  });
+
+  // Save state to localStorage
+  localStorage.setItem('dash_state', JSON.stringify(state));
+}
+
+// ===== INLINE EDIT SYNC =====
+document.addEventListener('focusout', function(e) {
+  if (e.target.contentEditable !== 'true') return;
+  if (e.target.id === 'cashOnHand') {
+    state.cashOnHand = p(e.target.textContent);
+    renderDashboard();
+    return;
+  }
+  if (e.target.classList.contains('cost')) {
+    var tr = e.target.closest('tr');
+    if (!tr) return;
+    var id = tr.getAttribute('data-id');
+    if (!id) return;
+    var val = p(e.target.textContent);
+    // Check costs
+    var found = state.costs.find(function(c) { return c.id === id; });
+    if (found) { found.cost = val; renderDashboard(); return; }
+    // Check revenue
+    var rev = state.revenue.find(function(r) { return r.id === id; });
+    if (rev) { rev.loanAmount = val; renderDashboard(); return; }
+  }
+});
+
+// ===== API KEY MODAL =====
 var gearBtn = document.getElementById('gearBtn');
 var keyModal = document.getElementById('keyModal');
 var keyInput = document.getElementById('keyInput');
 var keyStatus = document.getElementById('keyStatus');
-var keySave = document.getElementById('keySave');
-var keyCancel = document.getElementById('keyCancel');
-var keyClear = document.getElementById('keyClear');
 
 function updateGear() {
   var k = localStorage.getItem('anthropic_key');
   if (k) {
     gearBtn.classList.add('has-key');
-    gearBtn.title = 'API Key saved \u2713';
+    gearBtn.title = 'API Key saved';
     keyStatus.className = 'key-status saved';
-    keyStatus.textContent = '\u2713 Key saved: sk-ant-....' + k.slice(-6);
+    keyStatus.textContent = 'Key saved: ....' + k.slice(-6);
   } else {
     gearBtn.classList.remove('has-key');
     gearBtn.title = 'Set API Key';
@@ -211,157 +421,177 @@ function updateGear() {
 }
 
 gearBtn.addEventListener('click', function() { keyModal.classList.add('show'); keyInput.value = ''; updateGear(); });
-keyCancel.addEventListener('click', function() { keyModal.classList.remove('show'); });
+document.getElementById('keyCancel').addEventListener('click', function() { keyModal.classList.remove('show'); });
 keyModal.addEventListener('click', function(e) { if (e.target === keyModal) keyModal.classList.remove('show'); });
-
-keySave.addEventListener('click', function() {
+document.getElementById('keySave').addEventListener('click', function() {
   var v = keyInput.value.trim();
-  if (v) {
-    localStorage.setItem('anthropic_key', v);
-    updateGear();
-    keyInput.value = '';
-    setTimeout(function() { keyModal.classList.remove('show'); }, 600);
+  if (v) { localStorage.setItem('anthropic_key', v); updateGear(); keyInput.value = ''; setTimeout(function() { keyModal.classList.remove('show'); }, 400); }
+});
+document.getElementById('keyClear').addEventListener('click', function() { localStorage.removeItem('anthropic_key'); updateGear(); });
+
+// ===== CONVERSATION CONTROLS =====
+document.getElementById('newChatBtn').addEventListener('click', function() {
+  currentConvId = null;
+  localStorage.setItem('dash_current_conv', '');
+  renderConvSelect();
+  renderChatMessages();
+});
+
+document.getElementById('convSelect').addEventListener('change', function() {
+  currentConvId = this.value;
+  localStorage.setItem('dash_current_conv', currentConvId);
+  renderChatMessages();
+});
+
+// ===== BUILD STATE FOR AI =====
+function getStateForAI() {
+  return {
+    cashOnHand: state.cashOnHand,
+    costs: state.costs.map(function(c) {
+      return { id: c.id, name: c.name, cost: c.cost, category: c.category, nextPayment: c.nextPayment, dropping: c.dropping };
+    }),
+    revenue: state.revenue.map(function(r) {
+      return { id: r.id, scenario: r.scenario, loanAmount: r.loanAmount };
+    }),
+  };
+}
+
+// ===== APPLY AI UPDATES =====
+function applyUpdates(data) {
+  if (data.action === 'chat') return; // Just a conversation, no changes
+
+  if (data.cashOnHand !== null && data.cashOnHand !== undefined) {
+    state.cashOnHand = data.cashOnHand;
   }
-});
 
-keyClear.addEventListener('click', function() {
-  localStorage.removeItem('anthropic_key');
-  updateGear();
-});
-
-updateGear();
-
-// --- Recalc on manual edit ---
-document.addEventListener('input', function() {
-  var rows = document.querySelectorAll('#costTable tbody tr:not(.cat):not(.subtotal):not(.net-row)');
-  var t = 0;
-  rows.forEach(function(r) { var c = r.querySelector('.cost'); if (c) t += p(c.textContent); });
-  var el = document.getElementById('totalRow');
-  if (el) el.textContent = f(t);
-  document.getElementById('totalCost').textContent = f(t);
-  var cash = p(document.getElementById('cashOnHand').textContent);
-  var net = cash - t;
-  var ne = document.getElementById('netPosition');
-  if (ne) { ne.textContent = f(net); ne.style.color = net >= 0 ? 'var(--green)' : 'var(--red)'; }
-  var nl = document.getElementById('netLabel');
-  if (nl) nl.textContent = net >= 0 ? 'Covered' : 'Need to raise';
-  document.getElementById('runwayBurn').textContent = f(t);
-  document.getElementById('runwayShortfall').textContent = f(net);
-  document.getElementById('runwayShortfall').className = 'stat-value ' + (net >= 0 ? 'positive' : 'negative');
-  document.getElementById('runwayNeeded').textContent = f(Math.max(0, t - cash));
-  document.querySelectorAll('#revenueTable tbody tr').forEach(function(r) {
-    var c = r.querySelectorAll('td');
-    if (c.length >= 4) { var l = p(c[1].textContent); c[2].textContent = f(l * 0.015); c[3].textContent = f(l * 0.015 * 0.5); }
-  });
-});
-
-document.addEventListener('focusout', function(e) {
-  if (e.target.contentEditable === 'true' && (e.target.classList.contains('cost') || e.target.id === 'cashOnHand')) {
-    e.target.textContent = f(p(e.target.textContent));
+  if (data.costUpdates && data.costUpdates.length) {
+    data.costUpdates.forEach(function(u) {
+      var found = state.costs.find(function(c) { return c.id === u.id; });
+      if (found) found.cost = u.newCost;
+    });
   }
-});
 
-// --- AI Prompt via Supabase Edge Function proxy ---
+  if (data.removeCosts && data.removeCosts.length) {
+    data.removeCosts.forEach(function(id) {
+      state.costs = state.costs.filter(function(c) { return c.id !== id; });
+    });
+  }
+
+  if (data.addCosts && data.addCosts.length) {
+    data.addCosts.forEach(function(c) {
+      state.costs.push({
+        id: c.id || makeId(c.name),
+        name: c.name,
+        cost: c.cost,
+        category: c.category || 'non-essential-fixed',
+        nextPayment: c.nextPayment || 'Monthly',
+        dropping: false,
+      });
+    });
+  }
+
+  if (data.revenueUpdates && data.revenueUpdates.length) {
+    data.revenueUpdates.forEach(function(u) {
+      var found = state.revenue.find(function(r) { return r.id === u.id; });
+      if (found) found.loanAmount = u.loanAmount;
+    });
+  }
+
+  if (data.addRevenue && data.addRevenue.length) {
+    data.addRevenue.forEach(function(r) {
+      state.revenue.push({
+        id: r.id || makeId(r.scenario),
+        scenario: r.scenario,
+        loanAmount: r.loanAmount,
+      });
+    });
+  }
+
+  if (data.removeRevenue && data.removeRevenue.length) {
+    data.removeRevenue.forEach(function(id) {
+      state.revenue = state.revenue.filter(function(r) { return r.id !== id; });
+    });
+  }
+
+  renderDashboard();
+}
+
+// ===== SEND PROMPT =====
 async function sendPrompt() {
   var input = document.getElementById('chatInput');
   var btn = document.getElementById('chatSend');
-  var status = document.getElementById('chatStatus');
   var prompt = input.value.trim();
   if (!prompt) return;
 
   var apiKey = localStorage.getItem('anthropic_key');
   if (!apiKey) {
     keyModal.classList.add('show');
-    status.className = 'chat-status error';
-    status.textContent = 'Please set your API key first (click the gear icon)';
     return;
   }
 
+  // Add user message
+  addMessage('user', prompt);
+  renderChatMessages();
+  renderConvSelect();
+  input.value = '';
   btn.disabled = true;
-  status.className = 'chat-status loading';
-  status.textContent = 'Thinking...';
 
-  // Gather current dashboard state from the DOM
-  var currentState = { cashOnHand: p(document.getElementById('cashOnHand').textContent), costs: [], revenue: [] };
-  document.querySelectorAll('#costTable tbody tr:not(.cat):not(.subtotal):not(.net-row)').forEach(function(r) {
-    var tds = r.querySelectorAll('td');
-    if (tds.length >= 2) {
-      currentState.costs.push({ name: tds[0].textContent.replace('Dropping','').trim(), cost: p(tds[1].textContent) });
-    }
+  // Build messages for Anthropic (full conversation history)
+  var apiMessages = getCurrentMessages().map(function(m) {
+    if (m.role === 'user') return { role: 'user', content: m.content };
+    // For assistant messages, send the raw text Claude returned
+    return { role: 'assistant', content: m.content };
   });
-  document.querySelectorAll('#revenueTable tbody tr').forEach(function(r) {
-    var tds = r.querySelectorAll('td');
-    if (tds.length >= 2) {
-      currentState.revenue.push({ scenario: tds[0].textContent, loanAmount: p(tds[1].textContent) });
-    }
-  });
-
-  var systemPrompt = 'You are a financial dashboard assistant. The user has a cost/revenue dashboard. Here is the current state:\\n' + JSON.stringify(currentState) + '\\n\\nThe user will give you a natural language instruction to update the dashboard. Respond ONLY with valid JSON (no markdown, no explanation) in this format:\\n{\\n  "cashOnHand": number or null (null = no change),\\n  "costUpdates": [ {"name": "exact service name", "newCost": number} ] or [],\\n  "removeCosts": ["exact service name"] or [],\\n  "addCosts": [{"name": "string", "cost": number, "category": "essentials|non-essential-fixed|usage", "nextPayment": "date string or Usage or Monthly"}] or [],\\n  "revenueUpdates": [{"scenario": "exact name", "loanAmount": number}] or [],\\n  "addRevenue": [{"scenario": "string", "loanAmount": number}] or [],\\n  "message": "short confirmation of what changed"\\n}';
 
   try {
     var res = await fetch('https://sdwjofguhctqfetfhbmx.supabase.co/functions/v1/dashboard-ai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: prompt, apiKey: apiKey, systemPrompt: systemPrompt, currentState: currentState })
+      body: JSON.stringify({
+        apiKey: apiKey,
+        messages: apiMessages,
+        currentState: getStateForAI(),
+      }),
     });
 
     var data = await res.json();
 
     if (data.error) {
-      status.className = 'chat-status error';
-      status.textContent = data.error;
+      addMessage('assistant', JSON.stringify({ action: 'chat', message: 'Error: ' + data.error }));
+      renderChatMessages();
       btn.disabled = false;
       return;
     }
 
-    // Apply updates
-    var updates = data;
+    // Save the raw response as the assistant message
+    var rawText = data._rawAssistant || JSON.stringify(data);
+    addMessage('assistant', rawText);
+    renderChatMessages();
 
-    // Cash on hand
-    if (updates.cashOnHand !== null && updates.cashOnHand !== undefined) {
-      document.getElementById('cashOnHand').textContent = f(updates.cashOnHand);
-    }
+    // Apply any updates
+    applyUpdates(data);
 
-    // Cost updates
-    if (updates.costUpdates) {
-      updates.costUpdates.forEach(function(u) {
-        document.querySelectorAll('#costTable tbody tr:not(.cat):not(.subtotal):not(.net-row)').forEach(function(r) {
-          var name = r.querySelector('td').textContent.replace('Dropping','').trim().toLowerCase();
-          if (name.includes(u.name.toLowerCase()) || u.name.toLowerCase().includes(name)) {
-            r.querySelectorAll('td')[1].textContent = f(u.newCost);
-          }
-        });
-      });
-    }
-
-    // Remove costs
-    if (updates.removeCosts) {
-      updates.removeCosts.forEach(function(name) {
-        document.querySelectorAll('#costTable tbody tr:not(.cat):not(.subtotal):not(.net-row)').forEach(function(r) {
-          var rn = r.querySelector('td').textContent.replace('Dropping','').trim().toLowerCase();
-          if (rn.includes(name.toLowerCase()) || name.toLowerCase().includes(rn)) {
-            r.remove();
-          }
-        });
-      });
-    }
-
-    // Trigger recalc
-    document.dispatchEvent(new Event('input'));
-
-    status.className = 'chat-status success';
-    status.textContent = updates.message || 'Updated!';
-    input.value = '';
-  } catch(e) {
-    status.className = 'chat-status error';
-    status.textContent = 'Error: ' + e.message;
+  } catch (e) {
+    addMessage('assistant', JSON.stringify({ action: 'chat', message: 'Network error: ' + e.message }));
+    renderChatMessages();
   }
   btn.disabled = false;
-  setTimeout(function() { status.textContent = ''; }, 8000);
 }
 
 document.getElementById('chatSend').addEventListener('click', sendPrompt);
 document.getElementById('chatInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') sendPrompt(); });
+
+// ===== INIT =====
+// Load saved state
+var savedState = localStorage.getItem('dash_state');
+if (savedState) {
+  try { state = JSON.parse(savedState); } catch(e) {}
+}
+
+updateGear();
+renderDashboard();
+renderConvSelect();
+renderChatMessages();
 </script>
 </body>
 </html>
