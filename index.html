@@ -7,569 +7,315 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f1117;
-    --surface: #181a22;
-    --surface-2: #1e2130;
-    --border: #2a2d3a;
-    --text: #e4e4e7;
-    --text-muted: #8b8d9a;
-    --accent: #60a5fa;
-    --green: #4ade80;
-    --red: #f87171;
-    --amber: #fbbf24;
-    --essentials: #3b82f6;
-    --non-essential: #a78bfa;
-    --usage: #f59e0b;
+    --bg: #0f1117; --surface: #181a22; --surface-2: #1e2130; --border: #2a2d3a;
+    --text: #e4e4e7; --text-muted: #8b8d9a; --accent: #60a5fa; --green: #4ade80;
+    --red: #f87171; --amber: #fbbf24; --essentials: #3b82f6; --non-essential: #a78bfa; --usage: #f59e0b;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 2rem;
-  }
-
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem; padding-bottom: 8rem; }
   .container { max-width: 960px; margin: 0 auto; }
-
-  /* ── Cash on Hand Banner ── */
-  .cash-banner {
-    background: linear-gradient(135deg, #1a2a1a 0%, #1a2820 100%);
-    border: 1px solid #2d4a2d;
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-    margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .cash-banner .label {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #6ee7b7;
-    font-weight: 600;
-  }
-
-  .cash-banner .amount {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--green);
-  }
-
-  .cash-banner .updated {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: 0.25rem;
-  }
-
-  /* ── Runway Banner ── */
-  .runway-banner {
-    background: linear-gradient(135deg, #2a1a1a 0%, #281a1a 100%);
-    border: 1px solid #4a2d2d;
-    border-radius: 12px;
-    padding: 1.25rem 2rem;
-    margin-bottom: 2rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-  }
-
-  .runway-stat {
-    flex: 1;
-    min-width: 180px;
-  }
-
-  .runway-stat .stat-label {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-muted);
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-  }
-
-  .runway-stat .stat-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.3rem;
-    font-weight: 700;
-  }
-
+  .cash-banner { background: linear-gradient(135deg, #1a2a1a, #1a2820); border: 1px solid #2d4a2d; border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: .75rem; display: flex; align-items: center; justify-content: space-between; }
+  .cash-banner .label { font-size: .85rem; text-transform: uppercase; letter-spacing: .1em; color: #6ee7b7; font-weight: 600; }
+  .cash-banner .amount { font-family: 'JetBrains Mono', monospace; font-size: 2.2rem; font-weight: 700; color: var(--green); }
+  .cash-banner .updated { font-size: .75rem; color: var(--text-muted); margin-top: .25rem; }
+  .runway-banner { background: linear-gradient(135deg, #2a1a1a, #281a1a); border: 1px solid #4a2d2d; border-radius: 12px; padding: 1.25rem 2rem; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 2rem; }
+  .runway-stat { flex: 1; min-width: 180px; }
+  .runway-stat .stat-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--text-muted); font-weight: 600; margin-bottom: .3rem; }
+  .runway-stat .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight: 700; }
   .runway-stat .stat-value.negative { color: var(--red); }
   .runway-stat .stat-value.warning { color: var(--amber); }
   .runway-stat .stat-value.positive { color: var(--green); }
-
-  .runway-stat .stat-sub {
-    font-size: 0.72rem;
-    color: var(--text-muted);
-    margin-top: 0.15rem;
-  }
-
-  /* ── Section Headers ── */
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    margin-top: 2.5rem;
-  }
-
-  .section-header:first-of-type { margin-top: 0; }
-
-  .section-header h2 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-  }
-
-  .section-header .line {
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .section-header .total {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9rem;
-    color: var(--red);
-    font-weight: 600;
-  }
-
+  .runway-stat .stat-sub { font-size: .72rem; color: var(--text-muted); margin-top: .15rem; }
+  .section-header { display: flex; align-items: center; gap: .75rem; margin-bottom: 1rem; margin-top: 2.5rem; }
+  .section-header h2 { font-size: 1.1rem; font-weight: 600; }
+  .section-header .line { flex: 1; height: 1px; background: var(--border); }
+  .section-header .total { font-family: 'JetBrains Mono', monospace; font-size: .9rem; color: var(--red); font-weight: 600; }
   .section-header .total.revenue { color: var(--green); }
-
-  /* ── Tables ── */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--surface);
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-
-  thead th {
-    background: var(--surface-2);
-    padding: 0.75rem 1rem;
-    text-align: left;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    font-weight: 600;
-    border-bottom: 1px solid var(--border);
-  }
-
-  thead th:nth-child(2),
-  thead th:nth-child(3),
-  thead th:nth-child(4),
-  thead th:nth-child(5) {
-    text-align: right;
-  }
-
-  tbody td {
-    padding: 0.65rem 1rem;
-    font-size: 0.88rem;
-    border-bottom: 1px solid var(--border);
-  }
-
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+  thead th { background: var(--surface-2); padding: .75rem 1rem; text-align: left; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+  thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4) { text-align: right; }
+  tbody td { padding: .65rem 1rem; font-size: .88rem; border-bottom: 1px solid var(--border); }
   tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover { background: rgba(255,255,255,0.02); }
-
-  td.cost, td.revenue-val {
-    font-family: 'JetBrains Mono', monospace;
-    text-align: right;
-    font-weight: 500;
-    font-size: 0.85rem;
-  }
-
-  td.date {
-    text-align: right;
-    color: var(--text-muted);
-    font-size: 0.82rem;
-  }
-
-  td.date .ongoing-badge {
-    display: inline-block;
-    font-size: 0.65rem;
-    padding: 0.12rem 0.4rem;
-    border-radius: 4px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    background: rgba(245,158,11,0.12);
-    color: var(--usage);
-    border: 1px solid rgba(245,158,11,0.25);
-  }
-
-  /* Category rows */
-  tr.category-row td {
-    background: var(--surface-2);
-    font-weight: 700;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    padding: 0.5rem 1rem;
-  }
-
-  tr.category-row.essentials td { color: var(--essentials); }
-  tr.category-row.non-essentials td { color: var(--non-essential); }
-  tr.category-row.usage td { color: var(--usage); }
-
-  /* Subtotal row */
-  tr.subtotal td {
-    background: var(--surface-2);
-    font-weight: 700;
-    border-top: 2px solid var(--border);
-    padding: 0.75rem 1rem;
-  }
-
-  tr.subtotal td.cost { color: var(--red); font-size: 0.95rem; }
-
-  /* Net position row */
-  tr.net-row td {
-    background: #1a1a24;
-    font-weight: 700;
-    padding: 0.85rem 1rem;
-    font-size: 0.92rem;
-  }
-
+  tbody tr:hover { background: rgba(255,255,255,.02); }
+  td.cost { font-family: 'JetBrains Mono', monospace; text-align: right; font-weight: 500; font-size: .85rem; }
+  td.date { text-align: right; color: var(--text-muted); font-size: .82rem; }
+  .ongoing-badge { display: inline-block; font-size: .65rem; padding: .12rem .4rem; border-radius: 4px; font-weight: 600; text-transform: uppercase; background: rgba(245,158,11,.12); color: var(--usage); border: 1px solid rgba(245,158,11,.25); }
+  tr.cat td { background: var(--surface-2); font-weight: 700; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); padding: .5rem 1rem; }
+  tr.cat.ess td { color: var(--essentials); }
+  tr.cat.ne td { color: var(--non-essential); }
+  tr.cat.ub td { color: var(--usage); }
+  tr.subtotal td { background: var(--surface-2); font-weight: 700; border-top: 2px solid var(--border); padding: .75rem 1rem; }
+  tr.subtotal td.cost { color: var(--red); font-size: .95rem; }
+  tr.net-row td { background: #1a1a24; font-weight: 700; padding: .85rem 1rem; font-size: .92rem; }
   tr.net-row td.cost { font-size: 1rem; }
-
-  /* Dropping badge */
-  .badge {
-    display: inline-block;
-    font-size: 0.65rem;
-    padding: 0.15rem 0.45rem;
-    border-radius: 4px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-left: 0.5rem;
-    vertical-align: middle;
-  }
-
-  .badge.dropping {
-    background: rgba(251,191,36,0.15);
-    color: var(--amber);
-    border: 1px solid rgba(251,191,36,0.3);
-  }
-
-  /* Revenue table */
-  .scenario-header { text-align: right !important; white-space: nowrap; }
+  .badge { display: inline-block; font-size: .65rem; padding: .15rem .45rem; border-radius: 4px; font-weight: 600; text-transform: uppercase; margin-left: .5rem; vertical-align: middle; }
+  .badge.dropping { background: rgba(251,191,36,.15); color: var(--amber); border: 1px solid rgba(251,191,36,.3); }
   td.green { color: var(--green); }
-
-  /* Footer */
-  .footer {
-    margin-top: 2rem;
-    text-align: center;
-    font-size: 0.72rem;
-    color: var(--text-muted);
-    opacity: 0.6;
-  }
-
-  /* Editable hint */
-  [contenteditable]:hover {
-    outline: 1px dashed rgba(96,165,250,0.4);
-    outline-offset: 2px;
-    border-radius: 3px;
-  }
-
-  [contenteditable]:focus {
-    outline: 1px solid var(--accent);
-    outline-offset: 2px;
-    border-radius: 3px;
-    background: rgba(96,165,250,0.05);
-  }
-
-  .edit-hint {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    opacity: 0.5;
-    text-align: right;
-    margin-bottom: 0.5rem;
-  }
-
-  /* Next payment timeline */
-  .next-payment-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1rem 1.5rem;
-    margin-top: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-  }
-
-  .next-payment-bar .np-label {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    font-weight: 600;
-    white-space: nowrap;
-  }
-
-  .np-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-  }
-
-  .np-item .np-date {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--amber);
-    font-weight: 600;
-  }
-
-  .np-item .np-amount {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--red);
-    font-weight: 500;
-  }
-
-  .np-divider {
-    width: 1px;
-    height: 20px;
-    background: var(--border);
-  }
+  .footer { margin-top: 2rem; text-align: center; font-size: .72rem; color: var(--text-muted); opacity: .6; }
+  [contenteditable]:hover { outline: 1px dashed rgba(96,165,250,.4); outline-offset: 2px; border-radius: 3px; }
+  [contenteditable]:focus { outline: 1px solid var(--accent); outline-offset: 2px; border-radius: 3px; background: rgba(96,165,250,.05); }
+  .edit-hint { font-size: .7rem; color: var(--text-muted); opacity: .5; text-align: right; margin-bottom: .5rem; }
+  .npb { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.5rem; margin-top: 1rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+  .npb .npl { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); font-weight: 600; }
+  .npi { display: flex; align-items: center; gap: .5rem; font-size: .8rem; }
+  .npi .npd { font-family: 'JetBrains Mono', monospace; font-size: .75rem; color: var(--amber); font-weight: 600; }
+  .npi .npa { font-family: 'JetBrains Mono', monospace; font-size: .75rem; color: var(--red); font-weight: 500; }
+  .npv { width: 1px; height: 20px; background: var(--border); }
+  .chat-container { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 1rem 2rem; z-index: 100; }
+  .chat-inner { max-width: 960px; margin: 0 auto; display: flex; gap: .75rem; align-items: center; }
+  .chat-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .9rem; padding: .85rem 1.2rem; outline: none; }
+  .chat-input:focus { border-color: var(--accent); }
+  .chat-input::placeholder { color: var(--text-muted); opacity: .6; }
+  .chat-send { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: .85rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 600; cursor: pointer; }
+  .chat-send:hover { opacity: .85; }
+  .chat-send:disabled { opacity: .4; cursor: not-allowed; }
+  .chat-status { font-size: .72rem; color: var(--text-muted); text-align: center; margin-top: .5rem; max-width: 960px; margin-left: auto; margin-right: auto; }
+  .chat-status.success { color: var(--green); }
+  .chat-status.error { color: var(--red); }
+  .chat-status.loading { color: var(--amber); }
 </style>
 </head>
 <body>
 <div class="container">
-
-  <!-- ════════ CASH ON HAND ════════ -->
-  <div class="cash-banner">
-    <div>
-      <div class="label">Cash on Hand</div>
-      <div class="updated">Updated March 29, 2026</div>
-    </div>
-    <div class="amount" id="cashOnHand" contenteditable="true">$1,300.00</div>
+  <div class="cash-banner"><div><div class="label">Cash on Hand</div><div class="updated" id="updatedDate">Updated March 29, 2026</div></div><div class="amount" id="cashOnHand" contenteditable="true">$1,300.00</div></div>
+  <div class="runway-banner">
+    <div class="runway-stat"><div class="stat-label">April Projected Costs</div><div class="stat-value negative" id="runwayBurn">$4,225.24</div><div class="stat-sub">March costs paid in full</div></div>
+    <div class="runway-stat"><div class="stat-label">Funding Gap for April</div><div class="stat-value negative" id="runwayShortfall">-$2,925.24</div><div class="stat-sub">Cash on hand minus April costs</div></div>
+    <div class="runway-stat"><div class="stat-label">Need to Raise by Apr 8</div><div class="stat-value warning" id="runwayNeeded">$2,925.24</div><div class="stat-sub">First April payment due</div></div>
+    <div class="runway-stat"><div class="stat-label">Next Payment Due</div><div class="stat-value warning" id="nextPaymentAmount">$200.00</div><div class="stat-sub">Apr 8 &mdash; ChatGPT Pro (OpenClaw)</div></div>
   </div>
-
-  <!-- ════════ RUNWAY / FUNDING SUMMARY ════════ -->
-  <div class="runway-banner" id="runwayBanner">
-    <div class="runway-stat">
-      <div class="stat-label">April Projected Costs</div>
-      <div class="stat-value negative" id="runwayBurn">$4,225.24</div>
-      <div class="stat-sub">March costs paid in full</div>
-    </div>
-    <div class="runway-stat">
-      <div class="stat-label">Funding Gap for April</div>
-      <div class="stat-value negative" id="runwayShortfall">-$2,925.24</div>
-      <div class="stat-sub">Cash on hand minus April costs</div>
-    </div>
-    <div class="runway-stat">
-      <div class="stat-label">Need to Raise by Apr 8</div>
-      <div class="stat-value warning" id="runwayNeeded">$2,925.24</div>
-      <div class="stat-sub" id="runwayNextDate">First April payment due</div>
-    </div>
-    <div class="runway-stat">
-      <div class="stat-label">Next Payment Due</div>
-      <div class="stat-value warning" id="nextPaymentAmount">$200.00</div>
-      <div class="stat-sub" id="nextPaymentDetail">Apr 8 &mdash; ChatGPT Pro (OpenClaw)</div>
-    </div>
+  <div class="section-header"><h2>AI Spending &mdash; April 2026 (Projected)</h2><div class="line"></div><div class="total" id="totalCost">$4,225.24</div></div>
+  <div class="edit-hint">Click any value to edit &middot; Or use the prompt bar below</div>
+  <table id="costTable"><thead><tr><th>Service</th><th>Cost</th><th>Next Payment</th></tr></thead><tbody id="costBody"></tbody></table>
+  <div class="npb"><div class="npl">Upcoming Payments</div>
+    <div class="npi"><span>ChatGPT (OC)</span><span class="npd">Apr 8</span><span class="npa">$200</span></div><div class="npv"></div>
+    <div class="npi"><span>Whisper Flow</span><span class="npd">Apr 14</span><span class="npa">$90</span></div><div class="npv"></div>
+    <div class="npi"><span>Firecrawl</span><span class="npd">Apr 15</span><span class="npa">$100</span></div><div class="npv"></div>
+    <div class="npi"><span>ChatGPT (FH)</span><span class="npd">Apr 17</span><span class="npa">$200</span></div><div class="npv"></div>
+    <div class="npi"><span>Browser+Supa</span><span class="npd">Apr 21</span><span class="npa">$150</span></div><div class="npv"></div>
+    <div class="npi"><span>MiniMax+Manus</span><span class="npd">Apr 24</span><span class="npa">$245</span></div>
   </div>
+  <div class="section-header"><h2>Projected Revenue &mdash; Aircraft Financing</h2><div class="line"></div><div class="total revenue">1.5% Fee / 50% Share</div></div>
+  <table id="revenueTable"><thead><tr><th>Deal Scenario</th><th style="text-align:right">Loan Amount</th><th style="text-align:right">Gross Fee (1.5%)</th><th style="text-align:right">Your Share (50%)</th></tr></thead><tbody id="revBody"></tbody></table>
+  <div class="footer">Click any dollar value to edit &middot; Totals auto-recalculate &middot; Use the prompt bar to make changes with natural language</div>
+</div>
 
-  <!-- ════════ AI SPENDING ════════ -->
-  <div class="section-header">
-    <h2>AI Spending &mdash; April 2026 (Projected)</h2>
-    <div class="line"></div>
-    <div class="total" id="totalCost">$4,225.24</div>
+<div class="chat-container">
+  <div class="chat-inner">
+    <input class="chat-input" id="chatInput" type="text" placeholder='e.g. "Update cash to $3,000" or "Drop Mini Max" or "We closed the $5M deal"' />
+    <button class="chat-send" id="chatSend">Update</button>
   </div>
-
-  <div class="edit-hint">Click any value to edit</div>
-
-  <table id="costTable">
-    <thead>
-      <tr>
-        <th>Service</th>
-        <th>Cost</th>
-        <th>Next Payment</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Essentials -->
-      <tr class="category-row essentials"><td colspan="3">Essentials</td></tr>
-      <tr data-date="2026-04-26"><td>Claude Max (&times;3)</td><td class="cost" contenteditable="true">$600.00</td><td class="date">Apr 26, 2026</td></tr>
-      <tr data-date="2026-04-15"><td>Firecrawl</td><td class="cost" contenteditable="true">$100.00</td><td class="date">Apr 15, 2026</td></tr>
-      <tr data-date="2026-04-14"><td>Whisper Flow</td><td class="cost" contenteditable="true">$90.00</td><td class="date">Apr 14, 2026</td></tr>
-      <tr data-date="2026-04-21"><td>Browser</td><td class="cost" contenteditable="true">$75.00</td><td class="date">Apr 21, 2026</td></tr>
-
-      <!-- Non-Essentials Fixed -->
-      <tr class="category-row non-essentials"><td colspan="3">Non-Essentials &mdash; Fixed</td></tr>
-      <tr data-date="2026-04-08"><td>ChatGPT Pro (&times;1) &mdash; OpenClaw</td><td class="cost" contenteditable="true">$200.00</td><td class="date">Apr 8, 2026</td></tr>
-      <tr data-date="2026-04-17"><td>ChatGPT Pro (&times;1) &mdash; Firehorse</td><td class="cost" contenteditable="true">$200.00</td><td class="date">Apr 17, 2026</td></tr>
-      <tr data-date="2026-04-24"><td>Mini Max <span class="badge dropping">Dropping</span></td><td class="cost" contenteditable="true">$200.00</td><td class="date">Apr 24, 2026</td></tr>
-      <tr data-date="2026-04-30"><td>Zep Cloud <span class="badge dropping">Dropping</span></td><td class="cost" contenteditable="true">$130.00</td><td class="date"><span class="ongoing-badge">Monthly</span></td></tr>
-      <tr data-date="2026-04-30"><td>Eleven Labs <span class="badge dropping">Dropping</span></td><td class="cost" contenteditable="true">$99.00</td><td class="date"><span class="ongoing-badge">Monthly</span></td></tr>
-      <tr data-date="2026-04-21"><td>Supabase</td><td class="cost" contenteditable="true">$75.00</td><td class="date">Apr 21, 2026</td></tr>
-      <tr data-date="2026-04-27"><td>Hume AI</td><td class="cost" contenteditable="true">$75.00</td><td class="date">Apr 27, 2026</td></tr>
-      <tr data-date="2026-04-26"><td>Twilit</td><td class="cost" contenteditable="true">$50.00</td><td class="date">Apr 26, 2026</td></tr>
-      <tr data-date="2026-04-24"><td>Manus</td><td class="cost" contenteditable="true">$45.00</td><td class="date">Apr 24, 2026</td></tr>
-      <tr data-date="2026-04-28"><td>Gemini</td><td class="cost" contenteditable="true">$40.00</td><td class="date">Apr 28, 2026</td></tr>
-
-      <!-- Usage-Based -->
-      <tr class="category-row usage"><td colspan="3">Non-Essentials &mdash; Usage-Based</td></tr>
-      <tr data-date="2026-04-30"><td>OpenClaw (per-use)</td><td class="cost" contenteditable="true">$1,167.38</td><td class="date"><span class="ongoing-badge">Usage</span></td></tr>
-      <tr data-date="2026-04-30"><td>Extra usage (API tokens)</td><td class="cost" contenteditable="true">$578.86</td><td class="date"><span class="ongoing-badge">Usage</span></td></tr>
-      <tr data-date="2026-04-30"><td>Vast AI (GPU)</td><td class="cost" contenteditable="true">$500.00</td><td class="date"><span class="ongoing-badge">Usage</span></td></tr>
-
-      <!-- Total -->
-      <tr class="subtotal">
-        <td>Total Monthly Spend</td>
-        <td class="cost" id="totalRow">$4,225.24</td>
-        <td></td>
-      </tr>
-      <tr class="net-row">
-        <td>April Funding Gap (Cash &minus; Costs)</td>
-        <td class="cost" id="netPosition" style="color: var(--red);">-$2,925.24</td>
-        <td class="date" id="netLabel">Need to raise</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- Upcoming payment timeline -->
-  <div class="next-payment-bar">
-    <div class="np-label">Upcoming Payments</div>
-    <div class="np-item"><span>ChatGPT (OC)</span><span class="np-date">Apr 8</span><span class="np-amount">$200</span></div>
-    <div class="np-divider"></div>
-    <div class="np-item"><span>Whisper Flow</span><span class="np-date">Apr 14</span><span class="np-amount">$90</span></div>
-    <div class="np-divider"></div>
-    <div class="np-item"><span>Firecrawl</span><span class="np-date">Apr 15</span><span class="np-amount">$100</span></div>
-    <div class="np-divider"></div>
-    <div class="np-item"><span>ChatGPT (FH)</span><span class="np-date">Apr 17</span><span class="np-amount">$200</span></div>
-    <div class="np-divider"></div>
-    <div class="np-item"><span>Browser + Supa</span><span class="np-date">Apr 21</span><span class="np-amount">$150</span></div>
-    <div class="np-divider"></div>
-    <div class="np-item"><span>MiniMax + Manus</span><span class="np-date">Apr 24</span><span class="np-amount">$245</span></div>
-  </div>
-
-  <!-- ════════ PROJECTED REVENUE ════════ -->
-  <div class="section-header">
-    <h2>Projected Revenue &mdash; Aircraft Financing</h2>
-    <div class="line"></div>
-    <div class="total revenue">1.5% Acquisition Fee &middot; 50% Share</div>
-  </div>
-
-  <table id="revenueTable">
-    <thead>
-      <tr>
-        <th>Deal Scenario</th>
-        <th class="scenario-header">Loan Amount</th>
-        <th class="scenario-header">Gross Fee (1.5%)</th>
-        <th class="scenario-header">Your Share (50%)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Conservative</td>
-        <td class="cost" contenteditable="true">$4,500,000</td>
-        <td class="cost green" data-calc="fee">$67,500.00</td>
-        <td class="cost green" style="font-weight:700;" data-calc="share">$33,750.00</td>
-      </tr>
-      <tr>
-        <td>Base Case</td>
-        <td class="cost" contenteditable="true">$5,000,000</td>
-        <td class="cost green" data-calc="fee">$75,000.00</td>
-        <td class="cost green" style="font-weight:700;" data-calc="share">$37,500.00</td>
-      </tr>
-      <tr>
-        <td>Target</td>
-        <td class="cost" contenteditable="true">$17,000,000</td>
-        <td class="cost green" data-calc="fee">$255,000.00</td>
-        <td class="cost green" style="font-weight:700;" data-calc="share">$127,500.00</td>
-      </tr>
-      <tr>
-        <td>Upside</td>
-        <td class="cost" contenteditable="true">$100,000,000</td>
-        <td class="cost green" data-calc="fee">$1,500,000.00</td>
-        <td class="cost green" style="font-weight:700;" data-calc="share">$750,000.00</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div class="footer">Click any dollar value to edit &middot; Totals auto-recalculate &middot; Revenue = 1.5% fee &times; 50% share</div>
-
+  <div class="chat-status" id="chatStatus"></div>
 </div>
 
 <script>
-  function parseCurrency(str) {
-    return parseFloat(str.replace(/[^0-9.\-]/g, '')) || 0;
+var SUPABASE_URL = 'https://sdwjofguhctqfetfhbmx.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkd2pvZmd1aGN0cWZldGZoYm14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0ODkxNDUsImV4cCI6MjA5MDA2NTE0NX0.CaGir7r-1I3yv1YAd9StDo0fZv2sFCWTSNAOhQ5U4Nw';
+
+function p(s) { return parseFloat(String(s).replace(/[^0-9.\-]/g, '')) || 0; }
+function f(n) { var neg = n < 0; var a = Math.abs(n); return (neg ? '-$' : '$') + a.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.textContent;
+}
+
+function buildCostRow(name, cost, nextPayment, dropping) {
+  var tr = document.createElement('tr');
+  var td1 = document.createElement('td');
+  td1.textContent = name;
+  if (dropping) {
+    var badge = document.createElement('span');
+    badge.className = 'badge dropping';
+    badge.textContent = 'Dropping';
+    td1.appendChild(document.createTextNode(' '));
+    td1.appendChild(badge);
   }
-
-  function formatCurrency(n) {
-    const neg = n < 0;
-    const abs = Math.abs(n);
-    const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    return (neg ? '-$' : '$') + formatted;
+  var td2 = document.createElement('td');
+  td2.className = 'cost';
+  td2.contentEditable = 'true';
+  td2.textContent = f(cost);
+  var td3 = document.createElement('td');
+  td3.className = 'date';
+  if (nextPayment && nextPayment.match(/usage|monthly/i)) {
+    var badge2 = document.createElement('span');
+    badge2.className = 'ongoing-badge';
+    badge2.textContent = nextPayment;
+    td3.appendChild(badge2);
+  } else {
+    td3.textContent = nextPayment || '';
   }
+  tr.appendChild(td1);
+  tr.appendChild(td2);
+  tr.appendChild(td3);
+  return tr;
+}
 
-  function recalcAll() {
-    // Cost totals
-    const rows = document.querySelectorAll('#costTable tbody tr:not(.category-row):not(.subtotal):not(.net-row)');
-    let totalCost = 0;
-    rows.forEach(row => {
-      const cell = row.querySelector('.cost');
-      if (cell) totalCost += parseCurrency(cell.textContent);
-    });
-    document.getElementById('totalRow').textContent = formatCurrency(totalCost);
-    document.getElementById('totalCost').textContent = formatCurrency(totalCost);
+function buildCatRow(label, cls) {
+  var tr = document.createElement('tr');
+  tr.className = 'cat ' + cls;
+  var td = document.createElement('td');
+  td.colSpan = 3;
+  td.textContent = label;
+  tr.appendChild(td);
+  return tr;
+}
 
-    // Cash on hand
-    const cash = parseCurrency(document.getElementById('cashOnHand').textContent);
+function renderState(state) {
+  document.getElementById('cashOnHand').textContent = f(state.cashOnHand || 1300);
+  var now = new Date();
+  document.getElementById('updatedDate').textContent = 'Updated ' + now.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
 
-    // Net position
-    const net = cash - totalCost;
-    const netEl = document.getElementById('netPosition');
-    const netLabel = document.getElementById('netLabel');
-    netEl.textContent = formatCurrency(net);
-    netEl.style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
-    netLabel.textContent = net >= 0 ? 'Covered' : 'Need to raise';
+  var costBody = document.getElementById('costBody');
+  costBody.textContent = '';
 
-    // Runway banner
-    document.getElementById('runwayBurn').textContent = formatCurrency(totalCost);
-    document.getElementById('runwayShortfall').textContent = formatCurrency(net);
-    const shortfallEl = document.getElementById('runwayShortfall');
-    shortfallEl.className = 'stat-value ' + (net >= 0 ? 'positive' : 'negative');
-
-    const needed = Math.max(0, totalCost - cash);
-    document.getElementById('runwayNeeded').textContent = formatCurrency(needed);
-
-    // Revenue calc (50% of 1.5%)
-    const revRows = document.querySelectorAll('#revenueTable tbody tr');
-    revRows.forEach(row => {
-      const cells = row.querySelectorAll('td');
-      if (cells.length >= 4) {
-        const loan = parseCurrency(cells[1].textContent);
-        const fee = loan * 0.015;
-        const share = fee * 0.5;
-        cells[2].textContent = formatCurrency(fee);
-        cells[3].textContent = formatCurrency(share);
-      }
-    });
-  }
-
-  document.addEventListener('input', recalcAll);
-
-  document.addEventListener('focusout', (e) => {
-    if (e.target.contentEditable === 'true') {
-      if (e.target.classList.contains('cost') || e.target.id === 'cashOnHand') {
-        const val = parseCurrency(e.target.textContent);
-        e.target.textContent = formatCurrency(val);
-        recalcAll();
-      }
-    }
+  costBody.appendChild(buildCatRow('Essentials', 'ess'));
+  (state.costs || []).forEach(function(c) {
+    if (c.category === 'essentials') costBody.appendChild(buildCostRow(c.name, c.cost, c.nextPayment, c.dropping));
   });
+
+  costBody.appendChild(buildCatRow('Non-Essentials \u2014 Fixed', 'ne'));
+  (state.costs || []).forEach(function(c) {
+    if (c.category === 'non-essential-fixed') costBody.appendChild(buildCostRow(c.name, c.cost, c.nextPayment, c.dropping));
+  });
+
+  costBody.appendChild(buildCatRow('Non-Essentials \u2014 Usage-Based', 'ub'));
+  (state.usageCosts || []).forEach(function(c) {
+    costBody.appendChild(buildCostRow(c.name, c.cost, 'Usage', false));
+  });
+
+  var total = 0;
+  (state.costs || []).forEach(function(c) { total += c.cost; });
+  (state.usageCosts || []).forEach(function(c) { total += c.cost; });
+  var cash = state.cashOnHand || 1300;
+  var net = cash - total;
+
+  var subTr = document.createElement('tr');
+  subTr.className = 'subtotal';
+  var subTd1 = document.createElement('td');
+  subTd1.textContent = 'Total Monthly Spend';
+  var subTd2 = document.createElement('td');
+  subTd2.className = 'cost';
+  subTd2.id = 'totalRow';
+  subTd2.textContent = f(total);
+  var subTd3 = document.createElement('td');
+  subTr.appendChild(subTd1); subTr.appendChild(subTd2); subTr.appendChild(subTd3);
+  costBody.appendChild(subTr);
+
+  var netTr = document.createElement('tr');
+  netTr.className = 'net-row';
+  var netTd1 = document.createElement('td');
+  netTd1.textContent = 'April Funding Gap (Cash \u2212 Costs)';
+  var netTd2 = document.createElement('td');
+  netTd2.className = 'cost';
+  netTd2.id = 'netPosition';
+  netTd2.style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
+  netTd2.textContent = f(net);
+  var netTd3 = document.createElement('td');
+  netTd3.className = 'date';
+  netTd3.id = 'netLabel';
+  netTd3.textContent = net >= 0 ? 'Covered' : 'Need to raise';
+  netTr.appendChild(netTd1); netTr.appendChild(netTd2); netTr.appendChild(netTd3);
+  costBody.appendChild(netTr);
+
+  document.getElementById('totalCost').textContent = f(total);
+  document.getElementById('runwayBurn').textContent = f(total);
+  document.getElementById('runwayShortfall').textContent = f(net);
+  document.getElementById('runwayShortfall').className = 'stat-value ' + (net >= 0 ? 'positive' : 'negative');
+  document.getElementById('runwayNeeded').textContent = f(Math.max(0, total - cash));
+
+  var revBody = document.getElementById('revBody');
+  revBody.textContent = '';
+  (state.revenue || []).forEach(function(r) {
+    var fee = r.loanAmount * 0.015;
+    var share = fee * 0.5;
+    var tr = document.createElement('tr');
+    var td1 = document.createElement('td'); td1.textContent = r.scenario;
+    var td2 = document.createElement('td'); td2.className = 'cost'; td2.contentEditable = 'true'; td2.textContent = f(r.loanAmount);
+    var td3 = document.createElement('td'); td3.className = 'cost green'; td3.textContent = f(fee);
+    var td4 = document.createElement('td'); td4.className = 'cost green'; td4.style.fontWeight = '700'; td4.textContent = f(share);
+    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4);
+    revBody.appendChild(tr);
+  });
+}
+
+async function loadState() {
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/dashboard_state?id=eq.main&select=data', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    var rows = await res.json();
+    if (rows && rows.length > 0 && rows[0].data) {
+      renderState(rows[0].data);
+    }
+  } catch(e) {
+    console.log('Could not load state');
+  }
+}
+
+async function sendPrompt() {
+  var input = document.getElementById('chatInput');
+  var btn = document.getElementById('chatSend');
+  var status = document.getElementById('chatStatus');
+  var prompt = input.value.trim();
+  if (!prompt) return;
+
+  btn.disabled = true;
+  status.className = 'chat-status loading';
+  status.textContent = 'Thinking...';
+
+  try {
+    var res = await fetch(SUPABASE_URL + '/functions/v1/dashboard-ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: prompt })
+    });
+    var data = await res.json();
+    if (data.success && data.state) {
+      renderState(data.state);
+      status.className = 'chat-status success';
+      status.textContent = data.message || 'Updated!';
+      input.value = '';
+    } else {
+      status.className = 'chat-status error';
+      status.textContent = data.error || data.message || 'Something went wrong';
+    }
+  } catch(e) {
+    status.className = 'chat-status error';
+    status.textContent = 'Error: ' + e.message;
+  }
+  btn.disabled = false;
+  setTimeout(function() { status.textContent = ''; }, 8000);
+}
+
+document.getElementById('chatSend').addEventListener('click', sendPrompt);
+document.getElementById('chatInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') sendPrompt(); });
+
+document.addEventListener('input', function() {
+  var rows = document.querySelectorAll('#costTable tbody tr:not(.cat):not(.subtotal):not(.net-row)');
+  var t = 0;
+  rows.forEach(function(r) { var c = r.querySelector('.cost'); if (c) t += p(c.textContent); });
+  var el = document.getElementById('totalRow');
+  if (el) el.textContent = f(t);
+  document.getElementById('totalCost').textContent = f(t);
+  var cash = p(document.getElementById('cashOnHand').textContent);
+  var net = cash - t;
+  var ne = document.getElementById('netPosition');
+  if (ne) { ne.textContent = f(net); ne.style.color = net >= 0 ? 'var(--green)' : 'var(--red)'; }
+  var nl = document.getElementById('netLabel');
+  if (nl) nl.textContent = net >= 0 ? 'Covered' : 'Need to raise';
+  document.getElementById('runwayBurn').textContent = f(t);
+  document.getElementById('runwayShortfall').textContent = f(net);
+  document.getElementById('runwayShortfall').className = 'stat-value ' + (net >= 0 ? 'positive' : 'negative');
+  document.getElementById('runwayNeeded').textContent = f(Math.max(0, t - cash));
+  document.querySelectorAll('#revenueTable tbody tr').forEach(function(r) {
+    var c = r.querySelectorAll('td');
+    if (c.length >= 4) { var l = p(c[1].textContent); c[2].textContent = f(l * 0.015); c[3].textContent = f(l * 0.015 * 0.5); }
+  });
+});
+
+loadState();
 </script>
 </body>
 </html>
