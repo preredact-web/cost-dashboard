@@ -133,7 +133,7 @@
   <div class="section-header"><h2>AI Spending &mdash; April 2026 (Projected)</h2><div class="line"></div><div class="total" id="totalCost">$4,225.24</div></div>
   <div class="edit-hint">Click any value to edit &middot; Or use the prompt bar below</div>
 
-  <table id="costTable"><thead><tr><th>Service</th><th>Cost</th><th>Next Payment</th></tr></thead><tbody id="costBody"></tbody></table>
+  <table id="costTable"><thead><tr id="costHead"><th>Service</th><th>Cost</th><th>Next Payment</th></tr></thead><tbody id="costBody"></tbody></table>
 
   <div class="npb"><div class="npl">Upcoming Payments</div>
     <div class="npi"><span>ChatGPT (OC)</span><span class="npd">Apr 8</span><span class="npa">$200</span></div><div class="npv"></div>
@@ -145,7 +145,7 @@
   </div>
 
   <div class="section-header"><h2>Projected Revenue &mdash; Aircraft Financing</h2><div class="line"></div><div class="total revenue">1.5% Fee / 50% Share</div></div>
-  <table id="revenueTable"><thead><tr><th>Deal Scenario</th><th style="text-align:right">Loan Amount</th><th style="text-align:right">Gross Fee (1.5%)</th><th style="text-align:right">Your Share (50%)</th></tr></thead><tbody id="revBody"></tbody></table>
+  <table id="revenueTable"><thead><tr id="revHead"><th>Deal Scenario</th><th style="text-align:right">Loan Amount</th><th style="text-align:right">Gross Fee (1.5%)</th><th style="text-align:right">Your Share (50%)</th></tr></thead><tbody id="revBody"></tbody></table>
 
   <div class="footer">Click any dollar value to edit &middot; Totals auto-recalculate &middot; Use the prompt bar to make changes with natural language</div>
 </div>
@@ -197,6 +197,8 @@ var state = {
   cashOnHand: 1300,
   costs: JSON.parse(JSON.stringify(DEFAULT_COSTS)),
   revenue: JSON.parse(JSON.stringify(DEFAULT_REVENUE)),
+  customCostColumns: [],  // e.g. [{id:'notes', label:'Notes', type:'text'}]
+  customRevColumns: [],
 };
 
 // ===== CONVERSATIONS =====
@@ -282,6 +284,18 @@ function renderDashboard() {
 
   var costBody = document.getElementById('costBody');
   costBody.innerHTML = '';
+  var cc = state.customCostColumns || [];
+  var colCount = 3 + cc.length;
+
+  // Render dynamic header
+  var costHead = document.getElementById('costHead');
+  costHead.innerHTML = '<th>Service</th><th>Cost</th><th>Next Payment</th>';
+  cc.forEach(function(col) {
+    var th = document.createElement('th');
+    th.textContent = col.label;
+    th.style.textAlign = col.type === 'number' ? 'right' : 'left';
+    costHead.appendChild(th);
+  });
 
   var categories = [
     { key: 'essentials', label: 'Essentials', cls: 'ess' },
@@ -292,11 +306,10 @@ function renderDashboard() {
   var total = 0;
 
   categories.forEach(function(cat) {
-    // Category header
     var catTr = document.createElement('tr');
     catTr.className = 'cat ' + cat.cls;
     var catTd = document.createElement('td');
-    catTd.colSpan = 3;
+    catTd.colSpan = colCount;
     catTd.textContent = cat.label;
     catTr.appendChild(catTd);
     costBody.appendChild(catTr);
@@ -334,6 +347,19 @@ function renderDashboard() {
       tr.appendChild(td1);
       tr.appendChild(td2);
       tr.appendChild(td3);
+
+      // Custom columns
+      var custom = c.custom || {};
+      cc.forEach(function(col) {
+        var td = document.createElement('td');
+        td.contentEditable = 'true';
+        td.setAttribute('data-col', col.id);
+        td.textContent = custom[col.id] || '';
+        if (col.type === 'number') { td.className = 'cost'; td.textContent = custom[col.id] !== undefined ? f(custom[col.id]) : ''; }
+        else { td.style.fontSize = '.82rem'; td.style.color = 'var(--text-muted)'; }
+        tr.appendChild(td);
+      });
+
       costBody.appendChild(tr);
       total += c.cost;
     });
@@ -342,15 +368,14 @@ function renderDashboard() {
   // Subtotal
   var subTr = document.createElement('tr');
   subTr.className = 'subtotal';
-  subTr.innerHTML = '<td>Total Monthly Spend</td><td class="cost" id="totalRow">' + f(total) + '</td><td></td>';
+  subTr.innerHTML = '<td>Total Monthly Spend</td><td class="cost" id="totalRow">' + f(total) + '</td><td></td>' + cc.map(function() { return '<td></td>'; }).join('');
   costBody.appendChild(subTr);
 
   // Net row
   var net = state.cashOnHand - total;
   var netTr = document.createElement('tr');
   netTr.className = 'net-row';
-  netTr.innerHTML = '<td>April Funding Gap (Cash \u2212 Costs)</td><td class="cost" id="netPosition" style="color:' + (net >= 0 ? 'var(--green)' : 'var(--red)') + '">' + f(net) + '</td><td class="date" id="netLabel">' + (net >= 0 ? 'Covered' : 'Need to raise') + '</td>';
-  costBody.appendChild(netTr);
+  netTr.innerHTML = '<td>April Funding Gap (Cash \u2212 Costs)</td><td class="cost" id="netPosition" style="color:' + (net >= 0 ? 'var(--green)' : 'var(--red)') + '">' + f(net) + '</td><td class="date" id="netLabel">' + (net >= 0 ? 'Covered' : 'Need to raise') + '</td>' + cc.map(function() { return '<td></td>'; }).join('');
 
   // Header totals
   document.getElementById('totalCost').textContent = f(total);
@@ -362,12 +387,37 @@ function renderDashboard() {
   // Revenue
   var revBody = document.getElementById('revBody');
   revBody.innerHTML = '';
+  var rc = state.customRevColumns || [];
+
+  // Render dynamic revenue header
+  var revHead = document.getElementById('revHead');
+  revHead.innerHTML = '<th>Deal Scenario</th><th style="text-align:right">Loan Amount</th><th style="text-align:right">Gross Fee (1.5%)</th><th style="text-align:right">Your Share (50%)</th>';
+  rc.forEach(function(col) {
+    var th = document.createElement('th');
+    th.textContent = col.label;
+    th.style.textAlign = col.type === 'number' ? 'right' : 'left';
+    revHead.appendChild(th);
+  });
+
   state.revenue.forEach(function(r) {
     var fee = r.loanAmount * 0.015;
     var share = fee * 0.5;
     var tr = document.createElement('tr');
     tr.setAttribute('data-id', r.id);
-    tr.innerHTML = '<td>' + r.scenario + '</td><td class="cost" contenteditable="true">' + f(r.loanAmount) + '</td><td class="cost green">' + f(fee) + '</td><td class="cost green" style="font-weight:700">' + f(share) + '</td>';
+    var html = '<td>' + r.scenario + '</td><td class="cost" contenteditable="true">' + f(r.loanAmount) + '</td><td class="cost green">' + f(fee) + '</td><td class="cost green" style="font-weight:700">' + f(share) + '</td>';
+    tr.innerHTML = html;
+
+    // Custom revenue columns
+    var custom = r.custom || {};
+    rc.forEach(function(col) {
+      var td = document.createElement('td');
+      td.contentEditable = 'true';
+      td.setAttribute('data-col', col.id);
+      if (col.type === 'number') { td.className = 'cost'; td.textContent = custom[col.id] !== undefined ? f(custom[col.id]) : ''; }
+      else { td.textContent = custom[col.id] || ''; td.style.fontSize = '.82rem'; td.style.color = 'var(--text-muted)'; }
+      tr.appendChild(td);
+    });
+
     revBody.appendChild(tr);
   });
 
@@ -395,6 +445,20 @@ document.addEventListener('focusout', function(e) {
     // Check revenue
     var rev = state.revenue.find(function(r) { return r.id === id; });
     if (rev) { rev.loanAmount = val; renderDashboard(); return; }
+  }
+  // Custom column edit
+  var colId = e.target.getAttribute('data-col');
+  if (colId) {
+    var tr = e.target.closest('tr');
+    if (!tr) return;
+    var id = tr.getAttribute('data-id');
+    if (!id) return;
+    var item = state.costs.find(function(c) { return c.id === id; }) || state.revenue.find(function(r) { return r.id === id; });
+    if (item) {
+      if (!item.custom) item.custom = {};
+      item.custom[colId] = e.target.textContent.trim();
+      localStorage.setItem('dash_state', JSON.stringify(state));
+    }
   }
 });
 
@@ -441,7 +505,7 @@ document.getElementById('resetBtn').addEventListener('click', function() {
   localStorage.removeItem('dash_state');
   localStorage.removeItem('dash_conversations');
   localStorage.removeItem('dash_current_conv');
-  state = { cashOnHand: 1300, costs: JSON.parse(JSON.stringify(DEFAULT_COSTS)), revenue: JSON.parse(JSON.stringify(DEFAULT_REVENUE)) };
+  state = { cashOnHand: 1300, costs: JSON.parse(JSON.stringify(DEFAULT_COSTS)), revenue: JSON.parse(JSON.stringify(DEFAULT_REVENUE)), customCostColumns: [], customRevColumns: [] };
   conversations = {};
   currentConvId = null;
   renderDashboard();
@@ -460,11 +524,17 @@ function getStateForAI() {
   return {
     cashOnHand: state.cashOnHand,
     costs: state.costs.map(function(c) {
-      return { id: c.id, name: c.name, cost: c.cost, category: c.category, nextPayment: c.nextPayment, dropping: c.dropping };
+      var obj = { id: c.id, name: c.name, cost: c.cost, category: c.category, nextPayment: c.nextPayment, dropping: c.dropping };
+      if (c.custom && Object.keys(c.custom).length) obj.custom = c.custom;
+      return obj;
     }),
     revenue: state.revenue.map(function(r) {
-      return { id: r.id, scenario: r.scenario, loanAmount: r.loanAmount };
+      var obj = { id: r.id, scenario: r.scenario, loanAmount: r.loanAmount };
+      if (r.custom && Object.keys(r.custom).length) obj.custom = r.custom;
+      return obj;
     }),
+    customCostColumns: state.customCostColumns || [],
+    customRevColumns: state.customRevColumns || [],
   };
 }
 
@@ -522,6 +592,80 @@ function applyUpdates(data) {
   if (data.removeRevenue && data.removeRevenue.length) {
     data.removeRevenue.forEach(function(id) {
       state.revenue = state.revenue.filter(function(r) { return r.id !== id; });
+    });
+  }
+
+  // Add columns to cost table
+  if (data.addCostColumns && data.addCostColumns.length) {
+    if (!state.customCostColumns) state.customCostColumns = [];
+    data.addCostColumns.forEach(function(col) {
+      var id = col.id || makeId(col.label);
+      if (!state.customCostColumns.find(function(c) { return c.id === id; })) {
+        state.customCostColumns.push({ id: id, label: col.label, type: col.type || 'text' });
+      }
+    });
+  }
+
+  // Remove columns from cost table
+  if (data.removeCostColumns && data.removeCostColumns.length) {
+    data.removeCostColumns.forEach(function(id) {
+      state.customCostColumns = (state.customCostColumns || []).filter(function(c) { return c.id !== id; });
+      state.costs.forEach(function(c) { if (c.custom) delete c.custom[id]; });
+    });
+  }
+
+  // Add columns to revenue table
+  if (data.addRevColumns && data.addRevColumns.length) {
+    if (!state.customRevColumns) state.customRevColumns = [];
+    data.addRevColumns.forEach(function(col) {
+      var id = col.id || makeId(col.label);
+      if (!state.customRevColumns.find(function(c) { return c.id === id; })) {
+        state.customRevColumns.push({ id: id, label: col.label, type: col.type || 'text' });
+      }
+    });
+  }
+
+  // Remove columns from revenue table
+  if (data.removeRevColumns && data.removeRevColumns.length) {
+    data.removeRevColumns.forEach(function(id) {
+      state.customRevColumns = (state.customRevColumns || []).filter(function(c) { return c.id !== id; });
+      state.revenue.forEach(function(r) { if (r.custom) delete r.custom[id]; });
+    });
+  }
+
+  // Set custom cell values
+  if (data.setCellValues && data.setCellValues.length) {
+    data.setCellValues.forEach(function(v) {
+      var item = state.costs.find(function(c) { return c.id === v.rowId; }) || state.revenue.find(function(r) { return r.id === v.rowId; });
+      if (item) {
+        if (!item.custom) item.custom = {};
+        item.custom[v.columnId] = v.value;
+      }
+    });
+  }
+
+  // Update nextPayment dates
+  if (data.dateUpdates && data.dateUpdates.length) {
+    data.dateUpdates.forEach(function(u) {
+      var found = state.costs.find(function(c) { return c.id === u.id; });
+      if (found) found.nextPayment = u.nextPayment;
+    });
+  }
+
+  // Update dropping status
+  if (data.setDropping && data.setDropping.length) {
+    data.setDropping.forEach(function(u) {
+      var found = state.costs.find(function(c) { return c.id === u.id; });
+      if (found) found.dropping = u.dropping;
+    });
+  }
+
+  // Rename items
+  if (data.renameItems && data.renameItems.length) {
+    data.renameItems.forEach(function(u) {
+      var found = state.costs.find(function(c) { return c.id === u.id; }) || state.revenue.find(function(r) { return r.id === u.id; });
+      if (found) found.name = u.newName || found.name;
+      if (found && found.scenario !== undefined) found.scenario = u.newName || found.scenario;
     });
   }
 
