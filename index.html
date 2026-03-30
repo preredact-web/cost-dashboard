@@ -100,6 +100,8 @@
   .key-status { font-size: .75rem; margin-bottom: 1rem; padding: .5rem .75rem; border-radius: 6px; }
   .key-status.saved { background: rgba(74,222,128,.1); color: var(--green); border: 1px solid rgba(74,222,128,.2); }
   .key-status.none { background: rgba(248,113,113,.1); color: var(--red); border: 1px solid rgba(248,113,113,.2); }
+  .reset-btn { background: none; border: 1px solid var(--border); border-radius: 10px; padding: .6rem .75rem; cursor: pointer; font-size: .72rem; line-height: 1; color: var(--text-muted); font-family: 'DM Sans', sans-serif; }
+  .reset-btn:hover { border-color: var(--red); color: var(--red); }
 </style>
 </head>
 <body>
@@ -155,6 +157,7 @@
     <button class="gear-btn" id="gearBtn" title="Set API Key">&#x2699;</button>
     <select class="conv-select" id="convSelect" title="Conversations"></select>
     <button class="new-chat-btn" id="newChatBtn" title="New conversation">+ New</button>
+    <button class="reset-btn" id="resetBtn" title="Reset dashboard to original values">Reset</button>
     <input class="chat-input" id="chatInput" type="text" placeholder='e.g. "Update cash to $3,000" or "Drop Mini Max"' />
     <button class="chat-send" id="chatSend">Send</button>
   </div>
@@ -429,6 +432,19 @@ document.getElementById('keyClear').addEventListener('click', function() { local
 document.getElementById('newChatBtn').addEventListener('click', function() {
   currentConvId = null;
   localStorage.setItem('dash_current_conv', '');
+  renderConvSelect();
+  renderChatMessages();
+});
+
+document.getElementById('resetBtn').addEventListener('click', function() {
+  if (!confirm('Reset dashboard to original values? This clears all AI changes and conversations.')) return;
+  localStorage.removeItem('dash_state');
+  localStorage.removeItem('dash_conversations');
+  localStorage.removeItem('dash_current_conv');
+  state = { cashOnHand: 1300, costs: JSON.parse(JSON.stringify(DEFAULT_COSTS)), revenue: JSON.parse(JSON.stringify(DEFAULT_REVENUE)) };
+  conversations = {};
+  currentConvId = null;
+  renderDashboard();
   renderConvSelect();
   renderChatMessages();
 });
