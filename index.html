@@ -102,6 +102,9 @@
   .key-status.none { background: rgba(248,113,113,.1); color: var(--red); border: 1px solid rgba(248,113,113,.2); }
   .reset-btn { background: none; border: 1px solid var(--border); border-radius: 10px; padding: .6rem .75rem; cursor: pointer; font-size: .72rem; line-height: 1; color: var(--text-muted); font-family: 'DM Sans', sans-serif; }
   .reset-btn:hover { border-color: var(--red); color: var(--red); }
+  .undo-btn { background: none; border: 1px solid var(--border); border-radius: 10px; padding: .6rem .75rem; cursor: pointer; font-size: .72rem; line-height: 1; color: var(--text-muted); font-family: 'DM Sans', sans-serif; }
+  .undo-btn:hover { border-color: var(--amber); color: var(--amber); }
+  .undo-btn:disabled { opacity: .3; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -157,6 +160,7 @@
     <button class="gear-btn" id="gearBtn" title="Set API Key">&#x2699;</button>
     <select class="conv-select" id="convSelect" title="Conversations"></select>
     <button class="new-chat-btn" id="newChatBtn" title="New conversation">+ New</button>
+    <button class="undo-btn" id="undoBtn" title="Undo last AI change" disabled>Undo</button>
     <button class="reset-btn" id="resetBtn" title="Reset dashboard to original values">Reset</button>
     <input class="chat-input" id="chatInput" type="text" placeholder='e.g. "Update cash to $3,000" or "Drop Mini Max"' />
     <button class="chat-send" id="chatSend">Send</button>
@@ -551,6 +555,27 @@ document.getElementById('keySave').addEventListener('click', function() {
 });
 document.getElementById('keyClear').addEventListener('click', function() { localStorage.removeItem('anthropic_key'); updateGear(); });
 
+// ===== UNDO =====
+var undoStack = JSON.parse(localStorage.getItem('dash_undo') || '[]');
+
+function saveUndo() {
+  undoStack.push(JSON.stringify(state));
+  if (undoStack.length > 20) undoStack.shift();
+  localStorage.setItem('dash_undo', JSON.stringify(undoStack));
+  document.getElementById('undoBtn').disabled = false;
+}
+
+document.getElementById('undoBtn').addEventListener('click', function() {
+  if (!undoStack.length) return;
+  var prev = undoStack.pop();
+  localStorage.setItem('dash_undo', JSON.stringify(undoStack));
+  try { state = JSON.parse(prev); } catch(e) { return; }
+  renderDashboard();
+  if (!undoStack.length) document.getElementById('undoBtn').disabled = true;
+});
+
+if (undoStack.length) document.getElementById('undoBtn').disabled = false;
+
 // ===== CONVERSATION CONTROLS =====
 document.getElementById('newChatBtn').addEventListener('click', function() {
   currentConvId = null;
@@ -802,7 +827,8 @@ async function sendPrompt() {
     saveConversations();
     renderChatMessages();
 
-    // Apply any updates to the dashboard
+    // Save state for undo, then apply updates
+    if (data.action === 'update') saveUndo();
     applyUpdates(data);
 
   } catch (e) {
