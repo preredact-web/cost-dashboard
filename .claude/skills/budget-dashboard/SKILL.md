@@ -132,11 +132,27 @@ The dashboard is a single `index.html` with everything inline. Key patterns:
 
 **Chat/AI integration**: `sendPrompt()` (line 677) sends state + messages to a Supabase edge function. The edge function returns an `applyUpdates()` payload.
 
+## Obsidian Integration
+
+The dashboard syncs to Obsidian at:
+`/Users/vinnycherido/Documents/Obsidian Vault/Ops/AI Spending Log.md`
+
+**Sync command** — run `scripts/sync-to-obsidian.sh` to export current dashboard state to the Obsidian note. Or run it from Claude Code:
+```bash
+bash ~/.claude/skills/budget-dashboard/scripts/sync-to-obsidian.sh
+```
+
+**Logging changes** — after making dashboard changes, append to the Change Log section:
+```bash
+obsidian append path="Ops/AI Spending Log.md" content="### $(date '+%Y-%m-%d') — <summary>
+- <what changed and why>"
+```
+
 ## Validation
 
 Run the validation script to check a payload before applying:
 ```bash
-echo '{"action":"update","addCosts":[{"name":"Test","cost":50}]}' | node scripts/validate-payload.js
+node scripts/validate-payload.js '{"action":"update","addCosts":[{"name":"Test","cost":50}]}'
 ```
 
 ## References
