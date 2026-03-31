@@ -366,17 +366,61 @@ function renderDashboard() {
     });
   });
 
-  // Subtotal
+  // Subtotal row — sum each custom number column
   var subTr = document.createElement('tr');
   subTr.className = 'subtotal';
-  subTr.innerHTML = '<td>Total Monthly Spend</td><td class="cost" id="totalRow">' + f(total) + '</td><td></td>' + cc.map(function() { return '<td></td>'; }).join('');
+  var subTd1 = document.createElement('td'); subTd1.textContent = 'Total Monthly Spend';
+  var subTd2 = document.createElement('td'); subTd2.className = 'cost'; subTd2.id = 'totalRow'; subTd2.textContent = f(total);
+  var subTd3 = document.createElement('td');
+  subTr.appendChild(subTd1); subTr.appendChild(subTd2); subTr.appendChild(subTd3);
+  cc.forEach(function(col) {
+    var td = document.createElement('td');
+    if (col.type === 'number') {
+      td.className = 'cost';
+      var colTotal = 0;
+      state.costs.forEach(function(c) { if (c.custom && c.custom[col.id] !== undefined) colTotal += Number(c.custom[col.id]) || 0; });
+      td.textContent = f(colTotal);
+    }
+    subTr.appendChild(td);
+  });
   costBody.appendChild(subTr);
 
-  // Net row
+  // Next Round net row (auto-appears when "next-round-cost" column exists)
+  var nrCol = cc.find(function(c) { return c.id === 'next-round-cost'; });
+  if (nrCol) {
+    var nextRoundTotal = 0;
+    state.costs.forEach(function(c) { if (c.custom && c.custom['next-round-cost'] !== undefined) nextRoundTotal += Number(c.custom['next-round-cost']) || 0; });
+    var nrNet = state.cashOnHand - nextRoundTotal;
+    var nrTr = document.createElement('tr');
+    nrTr.className = 'net-row';
+    var nrTd1 = document.createElement('td'); nrTd1.textContent = 'Next Round Gap (Cash \u2212 Next Round)';
+    var nrTd2 = document.createElement('td'); nrTd2.className = 'cost'; nrTd2.style.color = 'var(--text-muted)'; nrTd2.textContent = '\u2014';
+    var nrTd3 = document.createElement('td');
+    nrTr.appendChild(nrTd1); nrTr.appendChild(nrTd2); nrTr.appendChild(nrTd3);
+    cc.forEach(function(col) {
+      var td = document.createElement('td');
+      if (col.id === 'next-round-cost') {
+        td.className = 'cost';
+        td.style.color = nrNet >= 0 ? 'var(--green)' : 'var(--red)';
+        td.style.fontWeight = '700';
+        td.textContent = f(nrNet);
+      }
+      nrTr.appendChild(td);
+    });
+    costBody.appendChild(nrTr);
+  }
+
+  // Net row (current month)
   var net = state.cashOnHand - total;
   var netTr = document.createElement('tr');
   netTr.className = 'net-row';
-  netTr.innerHTML = '<td>April Funding Gap (Cash \u2212 Costs)</td><td class="cost" id="netPosition" style="color:' + (net >= 0 ? 'var(--green)' : 'var(--red)') + '">' + f(net) + '</td><td class="date" id="netLabel">' + (net >= 0 ? 'Covered' : 'Need to raise') + '</td>' + cc.map(function() { return '<td></td>'; }).join('');
+  var netTd1 = document.createElement('td'); netTd1.textContent = 'April Funding Gap (Cash \u2212 Costs)';
+  var netTd2 = document.createElement('td'); netTd2.className = 'cost'; netTd2.id = 'netPosition';
+  netTd2.style.color = net >= 0 ? 'var(--green)' : 'var(--red)'; netTd2.textContent = f(net);
+  var netTd3 = document.createElement('td'); netTd3.className = 'date'; netTd3.id = 'netLabel';
+  netTd3.textContent = net >= 0 ? 'Covered' : 'Need to raise';
+  netTr.appendChild(netTd1); netTr.appendChild(netTd2); netTr.appendChild(netTd3);
+  cc.forEach(function() { var td = document.createElement('td'); netTr.appendChild(td); });
   costBody.appendChild(netTr);
 
   // Header totals — use bannerOverrides if set, otherwise calculate
@@ -777,6 +821,14 @@ var savedState = localStorage.getItem('dash_state');
 if (savedState) {
   try { state = JSON.parse(savedState); } catch(e) {}
 }
+
+// Cleanup: remove bogus summary rows that AI chat added as cost items
+state.costs = state.costs.filter(function(c) {
+  return c.id !== 'next-round-funding-gap' && !/funding.gap/i.test(c.name);
+});
+// Ensure bannerOverrides exists
+if (!state.bannerOverrides) state.bannerOverrides = {};
+localStorage.setItem('dash_state', JSON.stringify(state));
 
 updateGear();
 renderDashboard();
