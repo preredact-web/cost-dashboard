@@ -199,6 +199,7 @@ var state = {
   revenue: JSON.parse(JSON.stringify(DEFAULT_REVENUE)),
   customCostColumns: [],  // e.g. [{id:'notes', label:'Notes', type:'text'}]
   customRevColumns: [],
+  bannerOverrides: {},  // e.g. {runwayBurn: 3375, runwayShortfall: -1250, runwayNeeded: 0, ...}
 };
 
 // ===== CONVERSATIONS =====
@@ -378,12 +379,25 @@ function renderDashboard() {
   netTr.innerHTML = '<td>April Funding Gap (Cash \u2212 Costs)</td><td class="cost" id="netPosition" style="color:' + (net >= 0 ? 'var(--green)' : 'var(--red)') + '">' + f(net) + '</td><td class="date" id="netLabel">' + (net >= 0 ? 'Covered' : 'Need to raise') + '</td>' + cc.map(function() { return '<td></td>'; }).join('');
   costBody.appendChild(netTr);
 
-  // Header totals
+  // Header totals — use bannerOverrides if set, otherwise calculate
+  var bo = state.bannerOverrides || {};
+  var dispBurn = bo.runwayBurn !== undefined ? bo.runwayBurn : total;
+  var dispShortfall = bo.runwayShortfall !== undefined ? bo.runwayShortfall : net;
+  var dispNeeded = bo.runwayNeeded !== undefined ? bo.runwayNeeded : Math.max(0, total - state.cashOnHand);
+
   document.getElementById('totalCost').textContent = f(total);
-  document.getElementById('runwayBurn').textContent = f(total);
-  document.getElementById('runwayShortfall').textContent = f(net);
-  document.getElementById('runwayShortfall').className = 'stat-value ' + (net >= 0 ? 'positive' : 'negative');
-  document.getElementById('runwayNeeded').textContent = f(Math.max(0, total - state.cashOnHand));
+  document.getElementById('runwayBurn').textContent = f(dispBurn);
+  document.getElementById('runwayShortfall').textContent = f(dispShortfall);
+  document.getElementById('runwayShortfall').className = 'stat-value ' + (dispShortfall >= 0 ? 'positive' : 'negative');
+  document.getElementById('runwayNeeded').textContent = f(dispNeeded);
+
+  // Banner labels/subtitles override
+  if (bo.runwayBurnLabel) document.querySelector('#runwayBurn').closest('.runway-stat').querySelector('.stat-label').textContent = bo.runwayBurnLabel;
+  if (bo.runwayShortfallLabel) document.querySelector('#runwayShortfall').closest('.runway-stat').querySelector('.stat-label').textContent = bo.runwayShortfallLabel;
+  if (bo.runwayNeededLabel) document.querySelector('#runwayNeeded').closest('.runway-stat').querySelector('.stat-label').textContent = bo.runwayNeededLabel;
+  if (bo.runwayBurnSub) document.querySelector('#runwayBurn').closest('.runway-stat').querySelector('.stat-sub').textContent = bo.runwayBurnSub;
+  if (bo.runwayShortfallSub) document.querySelector('#runwayShortfall').closest('.runway-stat').querySelector('.stat-sub').textContent = bo.runwayShortfallSub;
+  if (bo.runwayNeededSub) document.querySelector('#runwayNeeded').closest('.runway-stat').querySelector('.stat-sub').textContent = bo.runwayNeededSub;
 
   // Revenue
   var revBody = document.getElementById('revBody');
@@ -506,7 +520,7 @@ document.getElementById('resetBtn').addEventListener('click', function() {
   localStorage.removeItem('dash_state');
   localStorage.removeItem('dash_conversations');
   localStorage.removeItem('dash_current_conv');
-  state = { cashOnHand: 1300, costs: JSON.parse(JSON.stringify(DEFAULT_COSTS)), revenue: JSON.parse(JSON.stringify(DEFAULT_REVENUE)), customCostColumns: [], customRevColumns: [] };
+  state = { cashOnHand: 1300, costs: JSON.parse(JSON.stringify(DEFAULT_COSTS)), revenue: JSON.parse(JSON.stringify(DEFAULT_REVENUE)), customCostColumns: [], customRevColumns: [], bannerOverrides: {} };
   conversations = {};
   currentConvId = null;
   renderDashboard();
@@ -536,6 +550,7 @@ function getStateForAI() {
     }),
     customCostColumns: state.customCostColumns || [],
     customRevColumns: state.customRevColumns || [],
+    bannerOverrides: state.bannerOverrides || {},
   };
 }
 
@@ -667,6 +682,18 @@ function applyUpdates(data) {
       var found = state.costs.find(function(c) { return c.id === u.id; }) || state.revenue.find(function(r) { return r.id === u.id; });
       if (found) found.name = u.newName || found.name;
       if (found && found.scenario !== undefined) found.scenario = u.newName || found.scenario;
+    });
+  }
+
+  // Set banner overrides (runway stats)
+  if (data.setBanner) {
+    if (!state.bannerOverrides) state.bannerOverrides = {};
+    Object.keys(data.setBanner).forEach(function(key) {
+      if (data.setBanner[key] === null) {
+        delete state.bannerOverrides[key];  // null clears the override
+      } else {
+        state.bannerOverrides[key] = data.setBanner[key];
+      }
     });
   }
 
